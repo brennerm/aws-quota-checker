@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- new check: ec2_on_demand_f_count
+- new check: ec2_on_demand_g_count
+- new check: ec2_on_demand_p_count
+- new check: ec2_on_demand_x_count
+- new check: ec2_on_demand_inf_count
+- new check: ec2_spot_f_count
+- new check: ec2_spot_g_count
+- new check: ec2_spot_p_count
+- new check: ec2_spot_x_count
+- new check: ec2_spot_inf_count
+
 ## [1.0.0] - 2021-02-24
 
 ### Added

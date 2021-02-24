@@ -30,7 +30,10 @@ class Runner:
         self.fail_on_warning = fail_on_error
 
     def __report(self, description, scope, current, maximum) -> ReportResult:
-        percentage = (current / maximum)
+        if maximum != 0:
+            percentage = (current / maximum)
+        else:
+            percentage = 0
 
         if percentage <= self.warning_threshold:
             symbol = CHECKMARK
