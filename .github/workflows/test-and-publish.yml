@@ -56,4 +56,3 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body_path: changelog_entry
-          draft: true

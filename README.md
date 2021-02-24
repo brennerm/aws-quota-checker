@@ -1,8 +1,12 @@
 # aws-quota-checker
 
-A tool that helps keeping track of your AWS quota utilization. It'll determine the limits of your AWS account and compare them to the number of current resources. A usual use case is to add it to your CI pipeline right after applying your IaC to check whether you are getting close to a limit.
+A tool that helps keeping track of your AWS quota utilization. It'll determine the limits of your AWS account and compare them to the number of current resources.
 
 ![Example output of aws-quota-checker](/img/example.png)
+
+This is especially useful cause today, cloud resources are being created from all kinds of sources, e.g. IaC and Kubernetes operators. This tool will give you a head start for requesting quota increases before you hit a quota limit to prevent being stuck with a production system not being able to scale anymore.
+
+A usual use case is to add it to your CI pipeline right after applying your IaC or run it on a regular basis. Feel free to leave a vote on [this issue](https://github.com/brennerm/aws-quota-checker/issues/1) if you'd like to see a Prometheus exporter.
 
 ## Installation
 
