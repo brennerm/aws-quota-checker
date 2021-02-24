@@ -2,6 +2,8 @@
 
 A tool that helps keeping track of your AWS quota utilization. It'll determine the limits of your AWS account and compare them to the number of current resources. A usual use case is to add it to your CI pipeline right after applying your IaC to check whether you are getting close to a limit.
 
+![Example output of aws-quota-checker](/img/example.png)
+
 ## Installation
 
 ### From pypi
