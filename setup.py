@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='aws-quota-checker',
-    version='0.1',
+    version='1.0.0',
     packages=find_packages(),
     install_requires=[
         'boto3',
@@ -12,7 +12,9 @@ setup(
     extras_require={
         'dev':{
             'autopep8',
-            'pylint'
+            'pylint',
+            'keepachangelog',
+            'wheel'
         }
     },
     entry_points='''
