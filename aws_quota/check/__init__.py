@@ -21,5 +21,5 @@ def __all_subclasses(cls):
     return set(cls.__subclasses__()).union(
         [s for c in cls.__subclasses__() for s in __all_subclasses(c)])
 
-ALL_CHECKS = [clazz for clazz in __all_subclasses(QuotaCheck) if clazz != InstanceQuotaCheck]
+ALL_CHECKS = sorted([clazz for clazz in __all_subclasses(QuotaCheck) if clazz != InstanceQuotaCheck], key=lambda clz: clz.key)
 ALL_INSTANCE_SCOPED_CHECKS = filter(lambda check: check.scope == QuotaScope.INSTANCE, ALL_CHECKS)
