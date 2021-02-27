@@ -2,7 +2,7 @@
 
 A tool that helps keeping track of your AWS quota utilization. It'll determine the limits of your AWS account and compare them to the number of current resources.
 
-![Example output of aws-quota-checker](/img/example.png)
+![Example output of aws-quota-checker](https://raw.githubusercontent.com/brennerm/aws-quota-checker/master/img/example.png)
 
 This is especially useful cause today, cloud resources are being created from all kinds of sources, e.g. IaC and Kubernetes operators. This tool will give you a head start for requesting quota increases before you hit a quota limit to prevent being stuck with a production system not being able to scale anymore.
 
