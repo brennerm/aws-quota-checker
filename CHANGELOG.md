@@ -19,8 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new check: ec2_spot_p_count
 - new check: ec2_spot_x_count
 - new check: ec2_spot_inf_count
+- new check: sns_topics_count
+- new check: sns_pending_subscriptions_count
+- new check: sns_subscriptions_per_topic
 
 ### Changed
+
 - sort checks alphabetically by key
 
 ## [1.0.0] - 2021-02-24
