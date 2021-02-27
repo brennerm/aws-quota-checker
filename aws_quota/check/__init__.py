@@ -13,6 +13,7 @@ from .iam import *
 from .route53 import *
 from .route53resolver import *
 from .s3 import *
+from .sns import *
 from .secretsmanager import *
 from .vpc import *
 from .quota_check import QuotaCheck
