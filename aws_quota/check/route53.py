@@ -1,3 +1,4 @@
+from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 import boto3
 from .quota_check import InstanceQuotaCheck, QuotaCheck, QuotaScope
@@ -84,11 +85,17 @@ class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_RRSETS_BY_ZONE', HostedZoneId=self.instance_id)['Limit']['Value']
+        try:
+            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_RRSETS_BY_ZONE', HostedZoneId=self.instance_id)['Limit']['Value']
+        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_RRSETS_BY_ZONE', HostedZoneId=self.instance_id)['Count']
+        try:
+            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_RRSETS_BY_ZONE', HostedZoneId=self.instance_id)['Count']
+        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
 
 class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
@@ -102,8 +109,14 @@ class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
 
     @property
     def maximum(self):
-        return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Limit']['Value']
+        try:
+            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Limit']['Value']
+        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
     @property
     def current(self):
-        return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Count']
+        try:
+            return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Count']
+        except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
+            raise InstanceWithIdentifierNotFound(self) from e

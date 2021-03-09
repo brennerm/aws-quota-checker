@@ -1,3 +1,4 @@
+from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 import boto3
 from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
@@ -36,9 +37,12 @@ class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('elb').describe_load_balancers(
-            LoadBalancerNames=[self.instance_id]
-        )['LoadBalancerDescriptions'][0]['ListenerDescriptions'])
+        try:
+            return len(self.boto_session.client('elb').describe_load_balancers(
+                LoadBalancerNames=[self.instance_id]
+            )['LoadBalancerDescriptions'][0]['ListenerDescriptions'])
+        except self.boto_session.client('elb').exceptions.AccessPointNotFoundException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
 
 class NetworkLoadBalancerCountCheck(QuotaCheck):
@@ -67,8 +71,11 @@ class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('elbv2').describe_listeners(
-            LoadBalancerArn=self.instance_id)['Listeners'])
+        try:
+            return len(self.boto_session.client('elbv2').describe_listeners(
+                LoadBalancerArn=self.instance_id)['Listeners'])
+        except self.boto_session.client('elbv2').exceptions.LoadBalancerNotFoundException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
 
 class ApplicationLoadBalancerCountCheck(QuotaCheck):
@@ -97,8 +104,11 @@ class ListenerPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
 
     @property
     def current(self) -> int:
-        return len(self.boto_session.client('elbv2').describe_listeners(
-            LoadBalancerArn=self.instance_id)['Listeners'])
+        try:
+            return len(self.boto_session.client('elbv2').describe_listeners(
+                LoadBalancerArn=self.instance_id)['Listeners'])
+        except self.boto_session.client('elbv2').exceptions.LoadBalancerNotFoundException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
 
 class TargetGroupCountCheck(QuotaCheck):

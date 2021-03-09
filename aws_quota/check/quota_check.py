@@ -1,3 +1,4 @@
+from aws_quota.utils import get_account_id
 import enum
 import typing
 
@@ -22,6 +23,22 @@ class QuotaCheck:
 
         self.boto_session = boto_session
         self.sq_client = boto_session.client('service-quotas')
+
+    def __str__(self) -> str:
+        return f'{self.key}{self.label_values}'
+
+    @property
+    def label_values(self):
+        if self.scope == QuotaScope.ACCOUNT:
+            return {'account': get_account_id(self.boto_session)}
+        elif self.scope == QuotaScope.REGION:
+            return {'account': get_account_id(self.boto_session), 'region': self.boto_session.region_name}
+        elif self.scope == QuotaScope.INSTANCE:
+            return {
+                'account': get_account_id(self.boto_session),
+                'region': self.boto_session.region_name,
+                'instance': self.instance_id
+            }
 
     @property
     def maximum(self) -> int:
