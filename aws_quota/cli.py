@@ -1,6 +1,5 @@
 import logging
 from aws_quota.utils import get_account_id
-from aws_quota.prometheus import PrometheusExporter, PrometheusExporterSettings
 import enum
 import typing
 import sys
@@ -218,6 +217,7 @@ def prometheus_exporter(check_keys, region, profile, port, namespace, limits_che
 
     Pass all to run all checks
     """
+    from aws_quota.prometheus import PrometheusExporter, PrometheusExporterSettings
 
     logging.basicConfig(
         level=logging.INFO,
