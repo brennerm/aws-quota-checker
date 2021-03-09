@@ -1,7 +1,17 @@
+from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
 import boto3
+import botocore.exceptions
 from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
+
+def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
+    client = session.client('ec2')
+    try:
+        client.describe_vpcs(VpcIds=[vpc_id])
+    except botocore.exceptions.ClientError as e:
+        return False
+    return True
 
 
 class VpcCountCheck(QuotaCheck):
@@ -66,11 +76,14 @@ class SubnetsPerVpcCountCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_subnets(Filters=[
-            {
-                'Name': 'vpc-id',
-                'Values': [self.instance_id]
-            }])['Subnets'])
+        if check_if_vpc_exists(self.boto_session, self.instance_id):
+            return len(self.boto_session.client('ec2').describe_subnets(Filters=[
+                {
+                    'Name': 'vpc-id',
+                    'Values': [self.instance_id]
+                }])['Subnets'])
+        else:
+            raise InstanceWithIdentifierNotFound(self)
 
 
 class AclsPerVpcCountCheck(InstanceQuotaCheck):
@@ -86,8 +99,11 @@ class AclsPerVpcCountCheck(InstanceQuotaCheck):
 
     @property
     def current(self) -> int:
-        return len(self.boto_session.client('ec2').describe_network_acls(Filters=[
-            {
-                'Name': 'vpc-id',
-                'Values': [self.instance_id]
-            }])['NetworkAcls'])
+        if check_if_vpc_exists(self.boto_session, self.instance_id):
+            return len(self.boto_session.client('ec2').describe_network_acls(Filters=[
+                {
+                    'Name': 'vpc-id',
+                    'Values': [self.instance_id]
+                }])['NetworkAcls'])
+        else:
+            raise InstanceWithIdentifierNotFound(self)

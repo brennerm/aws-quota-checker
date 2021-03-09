@@ -1,3 +1,6 @@
+import logging
+from aws_quota.utils import get_account_id
+from aws_quota.prometheus import PrometheusExporter, PrometheusExporterSettings
 import enum
 import typing
 import sys
@@ -64,11 +67,11 @@ class Runner:
             maximum = chk.maximum
 
             if chk.scope == QuotaScope.ACCOUNT:
-                scope = self.session.profile_name
+                scope = get_account_id(self.session)
             elif chk.scope == QuotaScope.REGION:
-                scope = f'{self.session.profile_name}/{self.session.region_name}'
+                scope = f'{get_account_id(self.session)}/{self.session.region_name}'
             elif chk.scope == QuotaScope.INSTANCE:
-                scope = f'{self.session.profile_name}/{self.session.region_name}/{chk.instance_id}'
+                scope = f'{get_account_id(self.session)}/{self.session.region_name}/{chk.instance_id}'
 
             result = self.__report(chk.description, scope, current, maximum)
 
@@ -86,21 +89,28 @@ def cli():
     pass
 
 
-def common_check_options(function):
+def common_scope_options(function):
     function = click.option(
         '--region', help='Region to use for region scoped quotas, defaults to current')(function)
     function = click.option(
         '--profile', help='AWS profile name to use, defaults to current')(function)
+
+    return function
+
+
+def common_check_options(function):
     function = click.option(
         '--warning-threshold', help='Warning threshold percentage for quota utilization, defaults to 0.8', default=0.8)(function)
     function = click.option(
         '--error-threshold', help='Error threshold percentage for quota utilization, defaults to 0.9', default=0.9)(function)
     function = click.option('--fail-on-warning/--no-fail-on-warning',
                             help='Exit with non-zero error code on quota warning, defaults to false', default=False)(function)
+
     return function
 
 
 @cli.command()
+@common_scope_options
 @common_check_options
 @click.argument('check-keys')
 def check(check_keys, region, profile, warning_threshold, error_threshold, fail_on_warning):
@@ -115,7 +125,7 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
     Execute list-checks command to get available check keys
 
     Pass all to run all checks
-    
+
     For instance checks it'll run through each individual instance available"""
 
     split_check_keys = check_keys.split(',')
@@ -134,7 +144,8 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
         selected_checks = list(
             filter(lambda c: c.key in whitelisted_check_keys, ALL_CHECKS))
 
-    selected_checks = list(filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
+    selected_checks = list(
+        filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
 
     session = boto3.Session(region_name=region, profile_name=profile)
 
@@ -158,6 +169,7 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
 
 
 @cli.command()
+@common_scope_options
 @common_check_options
 @click.argument('check-key')
 @click.argument('instance-id')
@@ -183,10 +195,76 @@ def check_instance(check_key, instance_id, region, profile, warning_threshold, e
 
 
 @cli.command()
+@common_scope_options
+@click.option('--port', help='Port on which to expose the Prometheus /metrics endpoint, defaults to 8080', default=8080)
+@click.option('--namespace', help='Namespace/prefix for Prometheus metrics, defaults to awsquota', default='awsquota')
+@click.option('--limits-check-interval', help='Interval in seconds at which to check the limit quota value, defaults to 600', default=600)
+@click.option('--currents-check-interval', help='Interval in seconds at which to check the current quota value, defaults to 300', default=300)
+@click.option('--reload-checks-interval', help='Interval in seconds at which to collect new checks e.g. when a new resource has been created, defaults to 600', default=600)
+@click.option('--enable-duration-metrics/--disable-duration-metrics', help='Flag to control whether to collect/expose duration metrics, defaults to true', default=True)
+@click.argument('check-keys')
+def prometheus_exporter(check_keys, region, profile, port, namespace, limits_check_interval, currents_check_interval, reload_checks_interval, enable_duration_metrics):
+    """Start a Prometheus exporter for quota checks
+
+    Set checks to execute with CHECK_KEYS
+
+    e.g. check vpc_count,ecs_count
+
+    Blacklist checks by prefixing them with !
+
+    e.g. check all,!vpc_count
+
+    Execute list-checks command to get available check keys
+
+    Pass all to run all checks
+    """
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S'
+    )
+
+    split_check_keys = check_keys.split(',')
+    blacklisted_check_keys = []
+    whitelisted_check_keys = []
+
+    for key in split_check_keys:
+        if key.startswith('!'):
+            blacklisted_check_keys.append(key.lstrip('!'))
+        else:
+            whitelisted_check_keys.append(key)
+
+    if 'all' in whitelisted_check_keys:
+        selected_checks = ALL_CHECKS
+    else:
+        selected_checks = list(
+            filter(lambda c: c.key in whitelisted_check_keys, ALL_CHECKS))
+
+    selected_checks = list(
+        filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
+
+    session = boto3.Session(region_name=region, profile_name=profile)
+
+    click.echo(
+        f'AWS profile: {session.profile_name} | AWS region: {session.region_name} | Active checks: {",".join([check.key for check in selected_checks])}')
+
+    settings = PrometheusExporterSettings(
+        port=port,
+        namespace=namespace,
+        get_currents_interval=currents_check_interval,
+        get_limits_interval=limits_check_interval,
+        reload_checks_interval=reload_checks_interval,
+        enable_duration_metrics=enable_duration_metrics
+    )
+
+    PrometheusExporter(session, selected_checks, settings).start()
+
+
+@cli.command()
 def list_checks():
     """List available quota checks"""
     click.echo(tabulate.tabulate([(chk.key, chk.description, chk.scope.name, getattr(chk, 'instance_id', 'N/A'))
-                             for chk in ALL_CHECKS], headers=['Key', 'Description', 'Scope', 'Instance ID']))
+                                  for chk in ALL_CHECKS], headers=['Key', 'Description', 'Scope', 'Instance ID']))
 
 
 if __name__ == '__main__':

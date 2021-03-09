@@ -1,3 +1,4 @@
+from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
 import boto3
@@ -37,6 +38,7 @@ class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
     description = "SNS subscriptions per topics"
     service_code = 'sns'
     quota_code = 'L-A4340BCD'
+    instance_id = 'Topic ARN'
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
@@ -44,5 +46,9 @@ class SubscriptionsPerTopicCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        topic_attrs = self.boto_session.client('sns').get_topic_attributes(TopicArn=self.instance_id)['Attributes']
+        try:
+            topic_attrs = self.boto_session.client('sns').get_topic_attributes(TopicArn=self.instance_id)['Attributes']
+        except self.boto_session.client('sns').exceptions.NotFoundException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
+
         return int(topic_attrs['SubscriptionsConfirmed']) + int(topic_attrs['SubscriptionsPending'])

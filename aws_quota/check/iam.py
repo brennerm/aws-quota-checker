@@ -1,3 +1,4 @@
+from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
 import boto3
@@ -89,7 +90,10 @@ class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('iam').list_user_policies(UserName=self.instance_id)['PolicyNames'])
+        try:
+            return len(self.boto_session.client('iam').list_user_policies(UserName=self.instance_id)['PolicyNames'])
+        except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
 class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_group"
@@ -106,7 +110,10 @@ class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('iam').list_group_policies(GroupName=self.instance_id)['PolicyNames'])
+        try:
+            return len(self.boto_session.client('iam').list_group_policies(GroupName=self.instance_id)['PolicyNames'])
+        except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
 
 class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_role"
@@ -123,4 +130,7 @@ class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('iam').list_role_policies(RoleName=self.instance_id)['PolicyNames'])
+        try:
+            return len(self.boto_session.client('iam').list_role_policies(RoleName=self.instance_id)['PolicyNames'])
+        except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
+            raise InstanceWithIdentifierNotFound(self) from e

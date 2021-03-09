@@ -23,6 +23,9 @@ setup(
             'pylint',
             'keepachangelog',
             'wheel'
+        },
+        'prometheus':{
+            'prometheus-client'
         }
     },
     entry_points='''
