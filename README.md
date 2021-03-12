@@ -141,16 +141,19 @@ To enable autocompletion for all check keys, sub commands and their options, fol
 ### Bash
 
 Add this to your _~/.bashrc_:
+
 `eval "$(_AWS_QUOTA_CHECKER_COMPLETE=source_bash aws-quota-checker)"`
 
 ### Zsh
 
 Add this to your _~/.zshrc_:
+
 `eval "$(_AWS_QUOTA_CHECKER_COMPLETE=source_zsh aws-quota-checker)"`
 
 ### Fish
 
 Add this to your _~/.config/fish/completions/aws-quota-checker.fish_:
+
 `eval "$(_AWS_QUOTA_CHECKER_COMPLETE=source_fish aws-quota-checker)"`
 
 ## Missing a quota check?
