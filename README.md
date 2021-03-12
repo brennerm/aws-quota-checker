@@ -18,6 +18,19 @@ A usual use case is to add it to your CI pipeline right after applying your IaC 
 pip install aws-quota-checker
 ```
 
+### From Docker
+
+```bash
+docker run -e AWS_ACCESS_KEY_ID=ABC -e AWS_SECRET_ACCESS_KEY=DEF -e AWS_DEFAULT_REGION=eu-central-1 ghcr.io/brennerm/aws-quota-checker
+```
+
+or
+
+```bash
+aws configure
+docker run -v ~/.aws/credentials:/home/aqc/.aws/credentials:ro ghcr.io/brennerm/aws-quota-checker
+```
+
 ### From source
 
 ```bash
