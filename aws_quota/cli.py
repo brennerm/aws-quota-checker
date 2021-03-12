@@ -11,6 +11,28 @@ from aws_quota.check.quota_check import InstanceQuotaCheck, QuotaCheck, QuotaSco
 from aws_quota.check import ALL_CHECKS, ALL_INSTANCE_SCOPED_CHECKS
 
 CHECKMARK = u'\u2713'
+ALL_CHECKS_CHOICE = click.Choice(['all'] + [chk.key for chk in ALL_CHECKS])
+
+
+def check_keys_to_check_classes(check_string: str):
+    split_check_keys = check_string.split(',')
+    blacklisted_check_keys = []
+    whitelisted_check_keys = []
+
+    for key in split_check_keys:
+        if key.startswith('!'):
+            blacklisted_check_keys.append(key.lstrip('!'))
+        else:
+            whitelisted_check_keys.append(key)
+
+    if 'all' in whitelisted_check_keys:
+        selected_checks = ALL_CHECKS
+    else:
+        selected_checks = list(
+            filter(lambda c: c.key in whitelisted_check_keys, ALL_CHECKS))
+
+    return list(
+        filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
 
 
 class Runner:
@@ -111,7 +133,7 @@ def common_check_options(function):
 @cli.command()
 @common_scope_options
 @common_check_options
-@click.argument('check-keys')
+@click.argument('check-keys', type=ALL_CHECKS_CHOICE)
 def check(check_keys, region, profile, warning_threshold, error_threshold, fail_on_warning):
     """Run checks identified by CHECK_KEYS
 
@@ -127,24 +149,7 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
 
     For instance checks it'll run through each individual instance available"""
 
-    split_check_keys = check_keys.split(',')
-    blacklisted_check_keys = []
-    whitelisted_check_keys = []
-
-    for key in split_check_keys:
-        if key.startswith('!'):
-            blacklisted_check_keys.append(key.lstrip('!'))
-        else:
-            whitelisted_check_keys.append(key)
-
-    if 'all' in whitelisted_check_keys:
-        selected_checks = ALL_CHECKS
-    else:
-        selected_checks = list(
-            filter(lambda c: c.key in whitelisted_check_keys, ALL_CHECKS))
-
-    selected_checks = list(
-        filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
+    selected_checks = check_keys_to_check_classes(check_keys)
 
     session = boto3.Session(region_name=region, profile_name=profile)
 
@@ -170,7 +175,7 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
 @cli.command()
 @common_scope_options
 @common_check_options
-@click.argument('check-key')
+@click.argument('check-key', type=click.Choice([chk.key for chk in ALL_INSTANCE_SCOPED_CHECKS]))
 @click.argument('instance-id')
 def check_instance(check_key, instance_id, region, profile, warning_threshold, error_threshold, fail_on_warning):
     """Run single check for single instance
@@ -201,7 +206,7 @@ def check_instance(check_key, instance_id, region, profile, warning_threshold, e
 @click.option('--currents-check-interval', help='Interval in seconds at which to check the current quota value, defaults to 300', default=300)
 @click.option('--reload-checks-interval', help='Interval in seconds at which to collect new checks e.g. when a new resource has been created, defaults to 600', default=600)
 @click.option('--enable-duration-metrics/--disable-duration-metrics', help='Flag to control whether to collect/expose duration metrics, defaults to true', default=True)
-@click.argument('check-keys')
+@click.argument('check-keys', type=ALL_CHECKS_CHOICE)
 def prometheus_exporter(check_keys, region, profile, port, namespace, limits_check_interval, currents_check_interval, reload_checks_interval, enable_duration_metrics):
     """Start a Prometheus exporter for quota checks
 
@@ -224,24 +229,7 @@ def prometheus_exporter(check_keys, region, profile, port, namespace, limits_che
         format='%(asctime)s [%(levelname)s] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S'
     )
 
-    split_check_keys = check_keys.split(',')
-    blacklisted_check_keys = []
-    whitelisted_check_keys = []
-
-    for key in split_check_keys:
-        if key.startswith('!'):
-            blacklisted_check_keys.append(key.lstrip('!'))
-        else:
-            whitelisted_check_keys.append(key)
-
-    if 'all' in whitelisted_check_keys:
-        selected_checks = ALL_CHECKS
-    else:
-        selected_checks = list(
-            filter(lambda c: c.key in whitelisted_check_keys, ALL_CHECKS))
-
-    selected_checks = list(
-        filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
+    selected_checks = check_keys_to_check_classes(check_keys)
 
     session = boto3.Session(region_name=region, profile_name=profile)
 

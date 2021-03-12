@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - now available as a Docker image, give it a try with `docker run ghcr.io/brennerm/aws-quota-checker:latest`
+- improve autocompletion support
 
 ## [1.2.0] - 2021-03-09
 

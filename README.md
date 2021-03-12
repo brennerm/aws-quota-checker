@@ -134,6 +134,25 @@ As querying all quotas, depending on the number of resources to check, may take 
 
 Hence it doesn't make too much sense to scrape the /metrics every few seconds cause the values will only refresh once in a while. The check intervals of the background jobs can be adjusted to your needs using command line arguments.
 
+## Autocompletion
+
+To enable autocompletion for all check keys, sub commands and their options, follow one of the next sections depending on the shell you use.
+
+### Bash
+
+Add this to your _~/.bashrc_:
+`eval "$(_AWS_QUOTA_CHECKER_COMPLETE=source_bash aws-quota-checker)"`
+
+### Zsh
+
+Add this to your _~/.zshrc_:
+`eval "$(_AWS_QUOTA_CHECKER_COMPLETE=source_zsh aws-quota-checker)"`
+
+### Fish
+
+Add this to your _~/.config/fish/completions/aws-quota-checker.fish_:
+`eval "$(_AWS_QUOTA_CHECKER_COMPLETE=source_fish aws-quota-checker)"`
+
 ## Missing a quota check?
 
 Feel free to create a new issue with the _New Check_ label including a description which quota check you are missing.
