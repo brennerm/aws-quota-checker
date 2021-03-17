@@ -133,7 +133,7 @@ def common_check_options(function):
 @cli.command()
 @common_scope_options
 @common_check_options
-@click.argument('check-keys', type=ALL_CHECKS_CHOICE)
+@click.argument('check-keys')
 def check(check_keys, region, profile, warning_threshold, error_threshold, fail_on_warning):
     """Run checks identified by CHECK_KEYS
 
@@ -206,7 +206,7 @@ def check_instance(check_key, instance_id, region, profile, warning_threshold, e
 @click.option('--currents-check-interval', help='Interval in seconds at which to check the current quota value, defaults to 300', default=300)
 @click.option('--reload-checks-interval', help='Interval in seconds at which to collect new checks e.g. when a new resource has been created, defaults to 600', default=600)
 @click.option('--enable-duration-metrics/--disable-duration-metrics', help='Flag to control whether to collect/expose duration metrics, defaults to true', default=True)
-@click.argument('check-keys', type=ALL_CHECKS_CHOICE)
+@click.argument('check-keys')
 def prometheus_exporter(check_keys, region, profile, port, namespace, limits_check_interval, currents_check_interval, reload_checks_interval, enable_duration_metrics):
     """Start a Prometheus exporter for quota checks
 
