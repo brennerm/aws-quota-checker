@@ -1,11 +1,10 @@
 from .quota_check import QuotaCheck, QuotaScope
 
-import functools
-
 import boto3
+import cachetools
 
 
-@functools.lru_cache
+@cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_running_ec2_instances(session: boto3.Session):
     return [instance for reservations in session.client('ec2').describe_instances(
             Filters=[
@@ -17,7 +16,7 @@ def get_all_running_ec2_instances(session: boto3.Session):
             )['Reservations'] for instance in reservations['Instances']]
 
 
-@functools.lru_cache
+@cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_spot_requests(session: boto3.Session):
     return session.client('ec2').describe_spot_instance_requests()[
         'SpotInstanceRequests']
