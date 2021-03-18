@@ -15,7 +15,8 @@ setup(
     install_requires=[
         'boto3',
         'click',
-        'tabulate'
+        'tabulate',
+        'cachetools'
     ],
     extras_require={
         'dev':{
