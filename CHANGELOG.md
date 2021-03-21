@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new check: vpc_route_tables_per_vpc
 - new check: vpc_routes_per_route_table
 - add Grafana dashboard: on-demand-ec2
+- new Prometheus metric that will expose the time it took to get the current/max value of each check
 
 ## [1.3.1] - 2021-03-17
 

@@ -99,6 +99,8 @@ The exporter will return the following metrics:
 
 - awsquota_$checkkey: the current value of each quota check
 - awsquota_$checkkey_limit: the limit value of each quota check
+- awsquota_$checkkey_duration_seconds: the time to get the current value of each quota check
+- awsquota_$checkkey_limit_duration_seconds: the time to get the limit value of each quota check
 - awsquota_check_count: the number of quota checks that are being executed
 - awsquota_check_limits_duration_seconds: the number of seconds that was necessary to query all quota limits
 - awsquota_check_currents_duration_seconds: the number of seconds that was necessary to query all current quota values

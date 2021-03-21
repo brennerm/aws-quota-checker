@@ -124,7 +124,11 @@ class PrometheusExporter:
                     name = f'{self.settings.namespace}_{check.key}_limit'
 
                     try:
-                        value = check.maximum
+                        with self.timeit_gauge(
+                            name,
+                            documentation=f'Time to collect {check.description} Limit'
+                        ):
+                            value = check.maximum
 
                         PrometheusExporter.get_or_create_gauge(
                             name,
@@ -160,11 +164,15 @@ class PrometheusExporter:
                     name = f'{self.settings.namespace}_{check.key}'
 
                     try:
-                        value = check.current
+                        with self.timeit_gauge(
+                            name,
+                            documentation=f'Time to collect {check.description}'
+                        ):
+                            value = check.current
 
                         PrometheusExporter.get_or_create_gauge(
                             name,
-                            documentation=f'{check.description}',
+                            documentation=check.description,
                             labelnames=labels.keys()
                         ).labels(**check.label_values).set(value)
                     except InstanceWithIdentifierNotFound as e:
