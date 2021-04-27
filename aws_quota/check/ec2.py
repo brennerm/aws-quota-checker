@@ -12,7 +12,8 @@ def get_all_running_ec2_instances(session: boto3.Session):
                     'Name': 'instance-state-name',
                     'Values': ['running']
                 }
-            ]
+            ],
+            MaxResults=1000
             )['Reservations'] for instance in reservations['Instances']]
 
 
