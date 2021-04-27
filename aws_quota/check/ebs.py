@@ -10,4 +10,4 @@ class SnapshotCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_snapshots()['Snapshots'])
+        return len(self.boto_session.client('ec2').describe_snapshots(OwnerIds=['self'])['Snapshots'])
