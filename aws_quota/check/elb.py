@@ -5,11 +5,21 @@ from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 
 
 def get_albs(session: boto3.Session):
-    return list(filter(lambda lb: lb['Type'] == 'application', session.client('elbv2').describe_load_balancers()['LoadBalancers']))
+    return list(
+        filter(
+            lambda lb: lb['Type'] == 'application',
+            session.client('elbv2').describe_load_balancers()['LoadBalancers'],
+        )
+    )
 
 
 def get_nlbs(session: boto3.Session):
-    return list(filter(lambda lb: lb['Type'] == 'network', session.client('elbv2').describe_load_balancers()['LoadBalancers']))
+    return list(
+        filter(
+            lambda lb: lb['Type'] == 'network',
+            session.client('elbv2').describe_load_balancers()['LoadBalancers'],
+        )
+    )
 
 
 class ClassicLoadBalancerCountCheck(QuotaCheck):
@@ -21,7 +31,9 @@ class ClassicLoadBalancerCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('elb').describe_load_balancers()['LoadBalancerDescriptions'])
+        return len(
+            self.boto_session.client('elb').describe_load_balancers()['LoadBalancerDescriptions']
+        )
 
 
 class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
@@ -33,14 +45,19 @@ class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [lb['LoadBalancerName'] for lb in session.client('elb').describe_load_balancers()['LoadBalancerDescriptions']]
+        return [
+            lb['LoadBalancerName']
+            for lb in session.client('elb').describe_load_balancers()['LoadBalancerDescriptions']
+        ]
 
     @property
     def current(self):
         try:
-            return len(self.boto_session.client('elb').describe_load_balancers(
-                LoadBalancerNames=[self.instance_id]
-            )['LoadBalancerDescriptions'][0]['ListenerDescriptions'])
+            return len(
+                self.boto_session.client('elb').describe_load_balancers(
+                    LoadBalancerNames=[self.instance_id]
+                )['LoadBalancerDescriptions'][0]['ListenerDescriptions']
+            )
         except self.boto_session.client('elb').exceptions.AccessPointNotFoundException as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
@@ -54,7 +71,14 @@ class NetworkLoadBalancerCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(list(filter(lambda lb: lb['Type'] == 'network', self.boto_session.client('elbv2').describe_load_balancers()['LoadBalancers'])))
+        return len(
+            list(
+                filter(
+                    lambda lb: lb['Type'] == 'network',
+                    self.boto_session.client('elbv2').describe_load_balancers()['LoadBalancers'],
+                )
+            )
+        )
 
 
 class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
@@ -66,14 +90,16 @@ class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [alb['LoadBalancerArn']
-                for alb in get_nlbs(session)]
+        return [alb['LoadBalancerArn'] for alb in get_nlbs(session)]
 
     @property
     def current(self):
         try:
-            return len(self.boto_session.client('elbv2').describe_listeners(
-                LoadBalancerArn=self.instance_id)['Listeners'])
+            return len(
+                self.boto_session.client('elbv2').describe_listeners(
+                    LoadBalancerArn=self.instance_id
+                )['Listeners']
+            )
         except self.boto_session.client('elbv2').exceptions.LoadBalancerNotFoundException as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
@@ -99,14 +125,16 @@ class ListenerPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
 
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [alb['LoadBalancerArn']
-                for alb in get_albs(session)]
+        return [alb['LoadBalancerArn'] for alb in get_albs(session)]
 
     @property
     def current(self) -> int:
         try:
-            return len(self.boto_session.client('elbv2').describe_listeners(
-                LoadBalancerArn=self.instance_id)['Listeners'])
+            return len(
+                self.boto_session.client('elbv2').describe_listeners(
+                    LoadBalancerArn=self.instance_id
+                )['Listeners']
+            )
         except self.boto_session.client('elbv2').exceptions.LoadBalancerNotFoundException as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
@@ -121,3 +149,26 @@ class TargetGroupCountCheck(QuotaCheck):
     @property
     def current(self):
         return len(self.boto_session.client('elbv2').describe_target_groups()['TargetGroups'])
+
+
+class TargetGroupsPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
+    key = "elb_target_groups_per_alb"
+    description = "Target groups per Application Load Balancer"
+    service_code = 'elasticloadbalancing'
+    quota_code = 'L-822D1B1B'
+    instance_id = 'Load Balancer ARN'
+
+    @staticmethod
+    def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
+        return [alb['LoadBalancerArn'] for alb in get_albs(session)]
+
+    @property
+    def current(self) -> int:
+        try:
+            return len(
+                self.boto_session.client('elbv2').describe_target_groups(
+                    LoadBalancerArn=self.instance_id
+                )['TargetGroups']
+            )
+        except self.boto_session.client('elbv2').exceptions.LoadBalancerNotFoundException as e:
+            raise InstanceWithIdentifierNotFound(self) from e
