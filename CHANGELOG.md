@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- new check: elb_target_groups_per_alb
+
 ### Fixed
 
 - fix wrong number of EBS snapshots
