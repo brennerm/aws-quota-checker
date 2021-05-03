@@ -10,7 +10,7 @@ from .eks import *
 from .elasticbeanstalk import *
 from .elb import *
 from .iam import *
-from .lambda import *
+from .lambdas import *
 from .route53 import *
 from .route53resolver import *
 from .s3 import *
@@ -19,9 +19,15 @@ from .secretsmanager import *
 from .vpc import *
 from .quota_check import QuotaCheck
 
+
 def __all_subclasses(cls):
     return set(cls.__subclasses__()).union(
-        [s for c in cls.__subclasses__() for s in __all_subclasses(c)])
+        [s for c in cls.__subclasses__() for s in __all_subclasses(c)]
+    )
 
-ALL_CHECKS = sorted([clazz for clazz in __all_subclasses(QuotaCheck) if clazz != InstanceQuotaCheck], key=lambda clz: clz.key)
+
+ALL_CHECKS = sorted(
+    [clazz for clazz in __all_subclasses(QuotaCheck) if clazz != InstanceQuotaCheck],
+    key=lambda clz: clz.key,
+)
 ALL_INSTANCE_SCOPED_CHECKS = filter(lambda check: check.scope == QuotaScope.INSTANCE, ALL_CHECKS)
