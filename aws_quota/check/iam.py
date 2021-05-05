@@ -29,8 +29,7 @@ class RoleCountCheck(QuotaCheck):
     @property
     def current(self):
         paginator = self.boto_session.client('iam').get_paginator('list_roles')
-        page_iterator = paginator.paginate()
-        return sum([len(page['Roles']) for page in page_iterator])
+        return sum([len(page['Roles']) for page in paginator.paginate()])
 
 
 class UsersCountCheck(QuotaCheck):
