@@ -30,4 +30,4 @@ ALL_CHECKS = sorted(
     [clazz for clazz in __all_subclasses(QuotaCheck) if clazz != InstanceQuotaCheck],
     key=lambda clz: clz.key,
 )
-ALL_INSTANCE_SCOPED_CHECKS = filter(lambda check: check.scope == QuotaScope.INSTANCE, ALL_CHECKS)
+ALL_INSTANCE_SCOPED_CHECKS = list(filter(lambda check: check.scope == QuotaScope.INSTANCE, ALL_CHECKS))
