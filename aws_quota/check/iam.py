@@ -19,6 +19,19 @@ class GroupCountCheck(QuotaCheck):
         return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Groups']
 
 
+class RoleCountCheck(QuotaCheck):
+    key = "iam_role_count"
+    description = "IAM roles per Account"
+    scope = QuotaScope.ACCOUNT
+    service_code = 'iam'
+    quota_code = 'L-FE177D64'
+
+    @property
+    def current(self):
+        paginator = self.boto_session.client('iam').get_paginator('list_roles')
+        return sum([len(page['Roles']) for page in paginator.paginate()])
+
+
 class UsersCountCheck(QuotaCheck):
     key = "iam_user_count"
     description = "IAM users per Account"
