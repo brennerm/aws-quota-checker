@@ -17,6 +17,7 @@ from .s3 import *
 from .sns import *
 from .secretsmanager import *
 from .vpc import *
+from .rds import *
 from .quota_check import QuotaCheck
 
 

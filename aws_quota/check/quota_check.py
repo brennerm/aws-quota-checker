@@ -27,6 +27,11 @@ class QuotaCheck:
     def __str__(self) -> str:
         return f'{self.key}{self.label_values}'
 
+    def count_paginated_results(self, service: str, method: str, key: str, paginate_args: dict = {}) -> int:
+        paginator = self.boto_session.client(service).get_paginator(method)
+        page_iterable = paginator.paginate(**paginate_args)
+        return sum(len(page[key]) for page in page_iterable)
+
     @property
     def label_values(self):
         if self.scope == QuotaScope.ACCOUNT:
