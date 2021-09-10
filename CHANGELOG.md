@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - iterator bug that prevented check-instance command to function
 
+### Security
+
+- update several dependencies
+
 ## [1.7.0] - 2021-05-05
 
 ### Added
