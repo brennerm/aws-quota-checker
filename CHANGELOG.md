@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- new check: rds_instances
+- new check: rds_parameter_groups
+- new check: rds_cluster_parameter_groups
+
 ### Fixed
 
 - iterator bug that prevented check-instance command to function
