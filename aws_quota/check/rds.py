@@ -33,3 +33,15 @@ class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
     @property
     def current(self) -> int:
         return self.count_paginated_results("rds", "describe_db_cluster_parameter_groups", "DBClusterParameterGroups")
+
+
+class RDSEventSubscriptions(QuotaCheck):
+    key = "rds_event_subscriptions"
+    description = "RDS event subscriptions per region"
+    service_code = "rds"
+    scope = QuotaScope.REGION
+    quota_code = "L-A59F4C87"
+
+    @property
+    def current(self) -> int:
+        return self.count_paginated_results("rds", "describe_event_subscriptions", "EventSubscriptionsList")
