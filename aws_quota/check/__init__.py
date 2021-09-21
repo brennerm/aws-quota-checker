@@ -1,7 +1,6 @@
 from .appmesh import *
 from .autoscaling import *
 from .cloudformation import *
-from .cloudwatch import *
 from .dynamodb import *
 from .ebs import *
 from .ec2 import *
