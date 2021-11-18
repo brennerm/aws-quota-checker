@@ -86,6 +86,7 @@ class Runner:
         for chk in self.checks:
             current = chk.current
             maximum = chk.maximum
+            awsfedault = chk.awsfedault
 
             if chk.scope == QuotaScope.ACCOUNT:
                 scope = get_account_id(self.session)
@@ -94,7 +95,7 @@ class Runner:
             elif chk.scope == QuotaScope.INSTANCE:
                 scope = f'{get_account_id(self.session)}/{self.session.region_name}/{chk.instance_id}'
 
-            result = self.__report(chk.description, scope, current, maximum)
+            result = self.__report(chk.description, scope, current, maximum, awsfedault)
 
             if result == Runner.ReportResult.WARNING:
                 warnings += 1
