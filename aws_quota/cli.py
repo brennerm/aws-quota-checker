@@ -72,8 +72,11 @@ class Runner:
             color = 'red'
             result = Runner.ReportResult.ERROR
 
+        if awsfedault != maximum:
+            defmax = 'NOTDEF'            
+            
         click.echo(
-            f'{description} [{scope}]: {current}/{maximum} ', nl=False)
+            f'{description} [{scope}]: {current}/{maximum}/{awsfedault} {defmax} ', nl=False)
 
         click.echo(click.style(symbol, fg=color, bold=True))
 
