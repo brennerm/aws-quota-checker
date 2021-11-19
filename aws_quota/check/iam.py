@@ -18,6 +18,10 @@ class GroupCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Groups']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
+
 
 class UsersCountCheck(QuotaCheck):
     key = "iam_user_count"
@@ -32,6 +36,9 @@ class UsersCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Users']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
 
 class PolicyCountCheck(QuotaCheck):
     key = "iam_policy_count"
@@ -46,6 +53,9 @@ class PolicyCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('iam').get_account_summary()['SummaryMap']['Policies']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
 
 class PolicyVersionCountCheck(QuotaCheck):
     key = "iam_policy_version_count"
@@ -60,6 +70,9 @@ class PolicyVersionCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('iam').get_account_summary()['SummaryMap']['PolicyVersionsInUse']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
 
 class ServerCertificateCountCheck(QuotaCheck):
     key = "iam_server_certificate_count"
@@ -74,6 +87,9 @@ class ServerCertificateCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('iam').get_account_summary()['SummaryMap']['ServerCertificates']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
 
 class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_user"
@@ -95,6 +111,10 @@ class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
         except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
+
 class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_group"
     description = "Attached IAM policies per group"
@@ -115,6 +135,10 @@ class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
         except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 
+
 class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_role"
     description = "Attached IAM policies per role"
@@ -134,3 +158,7 @@ class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
             return len(self.boto_session.client('iam').list_role_policies(RoleName=self.instance_id)['PolicyNames'])
         except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
             raise InstanceWithIdentifierNotFound(self) from e
+
+    @property
+    def awsdefault(self) -> int:
+            return int(self.maximum) 

@@ -53,7 +53,7 @@ class QuotaCheck:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         
     @property
-    def awsfedault(self) -> int:
+    def awsdefault(self) -> int:
         try:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:

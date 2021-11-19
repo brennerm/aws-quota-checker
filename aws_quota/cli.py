@@ -53,7 +53,7 @@ class Runner:
         self.error_threshold = error_threshold
         self.fail_on_warning = fail_on_error
 
-    def __report(self, description, scope, current, maximum) -> ReportResult:
+    def __report(self, description, scope, current, maximum, awsdefault) -> ReportResult:
         if maximum != 0:
             percentage = (current / maximum)
         else:
@@ -72,11 +72,13 @@ class Runner:
             color = 'red'
             result = Runner.ReportResult.ERROR
 
-        if awsfedault != maximum:
-            defmax = 'NOTDEF'            
+        if awsdefault != maximum and awsdefault > 0:
+            defmax = 'NOTDEF'   
+        else:
+            defmax = ''         
             
         click.echo(
-            f'{description} [{scope}]: {current}/{maximum}/{awsfedault} {defmax} ', nl=False)
+            f'{description} [{scope}]: {current}/{maximum}/{awsdefault} {defmax} ', nl=False)
 
         click.echo(click.style(symbol, fg=color, bold=True))
 
@@ -89,7 +91,7 @@ class Runner:
         for chk in self.checks:
             current = chk.current
             maximum = chk.maximum
-            awsfedault = chk.awsfedault
+            awsdefault = chk.awsdefault
 
             if chk.scope == QuotaScope.ACCOUNT:
                 scope = get_account_id(self.session)
@@ -98,7 +100,7 @@ class Runner:
             elif chk.scope == QuotaScope.INSTANCE:
                 scope = f'{get_account_id(self.session)}/{self.session.region_name}/{chk.instance_id}'
 
-            result = self.__report(chk.description, scope, current, maximum, awsfedault)
+            result = self.__report(chk.description, scope, current, maximum, awsdefault)
 
             if result == Runner.ReportResult.WARNING:
                 warnings += 1
