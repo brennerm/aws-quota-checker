@@ -17,6 +17,10 @@ class HostedZoneCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('route53').get_account_limit(Type='MAX_HOSTED_ZONES_BY_OWNER')['Count']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
+
 
 class HealthCheckCountCheck(QuotaCheck):
     key = "route53_health_check_count"
@@ -31,6 +35,9 @@ class HealthCheckCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('route53').get_account_limit(Type='MAX_HEALTH_CHECKS_BY_OWNER')['Count']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
 
 class ReusableDelegationSetCountCheck(QuotaCheck):
     key = "route53_reusable_delegation_set_count"
@@ -45,6 +52,9 @@ class ReusableDelegationSetCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('route53').get_account_limit(Type='MAX_REUSABLE_DELEGATION_SETS_BY_OWNER')['Count']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
 
 class TrafficPolicyCountCheck(QuotaCheck):
     key = "route53_traffic_policy_count"
@@ -59,6 +69,9 @@ class TrafficPolicyCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('route53').get_account_limit(Type='MAX_TRAFFIC_POLICIES_BY_OWNER')['Count']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
 
 class TrafficPolicyInstanceCountCheck(QuotaCheck):
     key = "route53_traffic_policy_instance_count"
@@ -73,6 +86,9 @@ class TrafficPolicyInstanceCountCheck(QuotaCheck):
     def current(self):
         return self.boto_session.client('route53').get_account_limit(Type='MAX_TRAFFIC_POLICY_INSTANCES_BY_OWNER')['Count']
 
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
 
 class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_records_per_hosted_zone"
@@ -97,6 +113,9 @@ class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
         except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
             raise InstanceWithIdentifierNotFound(self) from e
 
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
 
 class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_vpcs_per_hosted_zone"
@@ -120,3 +139,7 @@ class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
             return self.boto_session.client('route53').get_hosted_zone_limit(Type='MAX_VPCS_ASSOCIATED_BY_ZONE', HostedZoneId=self.instance_id)['Count']
         except self.boto_session.client('route53').exceptions.NoSuchHostedZone as e:
             raise InstanceWithIdentifierNotFound(self) from e
+
+    @property
+    def awsdefault(self) -> int:
+            return int(0) 
