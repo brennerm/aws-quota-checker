@@ -125,7 +125,6 @@ class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
             raise InstanceWithIdentifierNotFound(self)
 
 
-
 class RouteTablesPerVpcCheck(InstanceQuotaCheck):
     key = "vpc_route_tables_per_vpc"
     description = "Route Tables per VPC"
