@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='aws-quota-checker',
-    version='1.9.1',
+    version='1.10.0',
     description='A CLI tool that checks your AWS quota utilization',
     long_description=long_description,
     long_description_content_type='text/markdown',
