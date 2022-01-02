@@ -12,6 +12,17 @@ class AutoScalingGroupCountCheck(QuotaCheck):
     def current(self):
         return len(self.boto_session.client('autoscaling').describe_auto_scaling_groups()['AutoScalingGroups'])
 
+class AutoScalingECSTargetsCountCheck(QuotaCheck):
+    key = "ecsstrg_count"
+    description = "ECS scalable targets per region"
+    scope = QuotaScope.REGION
+    service_code = 'application-autoscaling'
+    quota_code = 'L-782A3EE2'
+
+    @property
+    def current(self):
+        return len(self.boto_session.client('application-autoscaling').describe_scalable_targets(ServiceNamespace='ecs',)['ScalableTargets'])
+
 
 class LaunchConfigurationCountCheck(QuotaCheck):
     key = "lc_count"

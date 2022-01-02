@@ -1,4 +1,3 @@
-from cachetools import cache
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
@@ -106,24 +105,25 @@ class SecurityGroupCountCheck(QuotaCheck):
         return len(self.boto_session.client('ec2').describe_security_groups()['SecurityGroups'])
 
 
-class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
-    key = "vpc_rules_per_sg"
-    description = "Rules per VPC security group"
-    service_code = 'vpc'
-    quota_code = 'L-0EA8095F'
-    instance_id = 'Security Group ID'
+# class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
+#     key = "vpc_rules_per_sg"
+#     description = "Rules per VPC security group"
+#     service_code = 'vpc'
+#     quota_code = 'L-0EA8095F'
+#     instance_id = 'Security Group ID'
 
-    @staticmethod
-    def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
-        return [sg['GroupId'] for sg in get_all_sgs(session)]
+#     @staticmethod
+#     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
+#         return [sg['GroupId'] for sg in get_all_sgs(session)]
 
-    @property
-    def current(self):
-        try:
-            sg = get_sg_by_id(self.boto_session, self.instance_id)
-            return len(sg['IpPermissions']) + len(sg['IpPermissionsEgress'])
-        except KeyError:
-            raise InstanceWithIdentifierNotFound(self)
+#     @property
+#     def current(self):
+#         try:
+#             sg = get_sg_by_id(self.boto_session, self.instance_id)
+#             return len(sg['IpPermissions']) + len(sg['IpPermissionsEgress'])
+#         except KeyError:
+#             raise InstanceWithIdentifierNotFound(self)
+
 
 
 class RouteTablesPerVpcCheck(InstanceQuotaCheck):

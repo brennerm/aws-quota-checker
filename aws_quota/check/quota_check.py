@@ -1,7 +1,7 @@
 from aws_quota.utils import get_account_id
 import enum
 import typing
-
+import botocore.exceptions
 import boto3
 
 
@@ -47,17 +47,23 @@ class QuotaCheck:
 
     @property
     def maximum(self) -> int:
-        try:
+        try:        
             return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+        except botocore.exceptions.EndpointConnectionError:
+            print('Connection error!! '+str(self.service_code)+str(self.quota_code))
+            return int(0)               
         
     @property
     def awsdefault(self) -> int:
         try:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(0)        
+            return int(0)
+        except botocore.exceptions.EndpointConnectionError:
+            print('Connection error!! '+str(self.service_code)+str(self.quota_code))
+            return int(0)                        
 
     @property
     def current(self) -> int:

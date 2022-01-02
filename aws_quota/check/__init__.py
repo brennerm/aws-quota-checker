@@ -10,15 +10,15 @@ from .elasticbeanstalk import *
 from .elb import *
 from .iam import *
 from .lambdas import *
+from .quota_check import QuotaCheck
+from .rds import *
 from .route53 import *
 from .route53resolver import *
 from .s3 import *
-from .sns import *
 from .secretsmanager import *
+from .ses import *
+from .sns import *
 from .vpc import *
-from .rds import *
-from .quota_check import QuotaCheck
-
 
 def __all_subclasses(cls):
     return set(cls.__subclasses__()).union(
