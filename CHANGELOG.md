@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2021-09-21
+
+### Added
+
+- fix MaxResults=1000 for EC2 instances check  (from baec59a)
+- new checks: ecsstrg_count,fargatespot_count,fargatedemand_count,iam_role_count (from PR#23)
+- added service/quota_code: iam_user_count
+- fixed description: s3_bucket_count
+- feature: display NOTDEF for check if limit in AWS is not default (was increased)
+- catch EndpointConnectionError
+
+### Removed
+
+- 
+
+
 ## [1.9.0] - 2021-09-21
 
 ### Added
