@@ -20,7 +20,7 @@ class GroupCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class RoleCountCheck(QuotaCheck):
     key = "iam_role_count"
@@ -28,6 +28,11 @@ class RoleCountCheck(QuotaCheck):
     scope = QuotaScope.ACCOUNT
     service_code = 'iam'
     quota_code = 'L-FE177D64'
+
+    @property
+    def maximum(self):
+    #    return self.boto_session.client('iam').get_account_summary()['SummaryMap']['UsersQuota']
+        return int(-1)
 
     @property
     def current(self):
@@ -39,7 +44,7 @@ class RoleCountCheck(QuotaCheck):
         try:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(0)            
+            return int(-1)            
 
 
 class UsersCountCheck(QuotaCheck):
@@ -62,7 +67,7 @@ class UsersCountCheck(QuotaCheck):
         try:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(0)   
+            return int(-1)   
 
 class PolicyCountCheck(QuotaCheck):
     key = "iam_policy_count"
@@ -79,7 +84,7 @@ class PolicyCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class PolicyVersionCountCheck(QuotaCheck):
     key = "iam_policy_version_count"
@@ -96,7 +101,7 @@ class PolicyVersionCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class ServerCertificateCountCheck(QuotaCheck):
     key = "iam_server_certificate_count"
@@ -113,7 +118,7 @@ class ServerCertificateCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_user"
@@ -137,7 +142,7 @@ class AttachedPolicyPerUserCheck(InstanceQuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_group"
@@ -161,7 +166,7 @@ class AttachedPolicyPerGroupCheck(InstanceQuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
     key = "iam_attached_policy_per_role"
@@ -185,4 +190,4 @@ class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 

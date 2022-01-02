@@ -19,7 +19,7 @@ class HostedZoneCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 
 class HealthCheckCountCheck(QuotaCheck):
@@ -37,7 +37,7 @@ class HealthCheckCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class ReusableDelegationSetCountCheck(QuotaCheck):
     key = "route53_reusable_delegation_set_count"
@@ -54,7 +54,7 @@ class ReusableDelegationSetCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class TrafficPolicyCountCheck(QuotaCheck):
     key = "route53_traffic_policy_count"
@@ -71,7 +71,7 @@ class TrafficPolicyCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class TrafficPolicyInstanceCountCheck(QuotaCheck):
     key = "route53_traffic_policy_instance_count"
@@ -88,7 +88,7 @@ class TrafficPolicyInstanceCountCheck(QuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_records_per_hosted_zone"
@@ -115,7 +115,7 @@ class RecordsPerHostedZoneCheck(InstanceQuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 
 
 class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
     key = "route53_vpcs_per_hosted_zone"
@@ -142,4 +142,4 @@ class AssociatedVpcHostedZoneCheck(InstanceQuotaCheck):
 
     @property
     def awsdefault(self) -> int:
-            return int(0) 
+            return int(-1) 

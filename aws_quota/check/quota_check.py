@@ -50,20 +50,25 @@ class QuotaCheck:
         try:        
             return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            try:
+                return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            except self.sq_client.exceptions.NoSuchResourceException:
+                print('ERROR get maximum : '+str(self.service_code)+str(self.quota_code))
+                return int(-1)  
         except botocore.exceptions.EndpointConnectionError:
-            print('Connection error!! '+str(self.service_code)+str(self.quota_code))
-            return int(0)               
+            print('ERROR: get maximum, connection : '+str(self.service_code)+str(self.quota_code))
+            return int(-1)               
         
     @property
     def awsdefault(self) -> int:
         try:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(0)
+            print('ERROR get default : '+str(self.service_code)+str(self.quota_code))
+            return int(-1)
         except botocore.exceptions.EndpointConnectionError:
-            print('Connection error!! '+str(self.service_code)+str(self.quota_code))
-            return int(0)                        
+            print('ERROR get defult, connection : '+str(self.service_code)+str(self.quota_code))
+            return int(-1)                        
 
     @property
     def current(self) -> int:
