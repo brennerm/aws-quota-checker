@@ -1,4 +1,3 @@
-from cachetools import cache
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 
