@@ -131,9 +131,10 @@ class Runner:
 @click.option('--debug/--no-debug', default=False)
 def cli(debug):
     logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
         format='%(asctime)s [%(levelname)s] %(name)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S'
     )
-    logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    logging.getLogger('botocore.credentials').setLevel(logging.WARNING)
 
 
 def common_scope_options(function):

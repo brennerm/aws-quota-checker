@@ -34,16 +34,18 @@ class QuotaCheck:
 
     @property
     def label_values(self):
-        if self.scope == QuotaScope.ACCOUNT:
-            return {'account': get_account_id(self.boto_session)}
-        elif self.scope == QuotaScope.REGION:
-            return {'account': get_account_id(self.boto_session), 'region': self.boto_session.region_name}
-        elif self.scope == QuotaScope.INSTANCE:
-            return {
-                'account': get_account_id(self.boto_session),
-                'region': self.boto_session.region_name,
-                'instance': self.instance_id
-            }
+        label_values = {
+            'quota': self.key,
+            'account': get_account_id(self.boto_session)
+        }
+
+        if self.scope in (QuotaScope.REGION, QuotaScope.INSTANCE):
+            label_values['region'] = self.boto_session.region_name
+
+        if self.scope == QuotaScope.INSTANCE:
+            label_values['instance'] = self.instance_id
+
+        return label_values
 
     @property
     def maximum(self) -> int:

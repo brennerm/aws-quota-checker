@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add error handling for CLI result reporter
 - new check: iam_role_count
+- Prometheus metrics now have a new label that contains the quota key, see [#31](https://github.com/brennerm/aws-quota-checker/issues/31) for further details
 
 ## [1.9.0] - 2021-09-21
 
