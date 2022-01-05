@@ -134,3 +134,22 @@ class AttachedPolicyPerRoleCheck(InstanceQuotaCheck):
             return len(self.boto_session.client('iam').list_role_policies(RoleName=self.instance_id)['PolicyNames'])
         except self.boto_session.client('iam').exceptions.NoSuchEntityException as e:
             raise InstanceWithIdentifierNotFound(self) from e
+
+class RoleCountCheck(QuotaCheck):
+    key = "iam_role_count"
+    description = "IAM roles per Account"
+    scope = QuotaScope.ACCOUNT
+    service_code = 'iam'
+    quota_code = 'L-FE177D64'
+
+    @property
+    def current(self):
+        paginator = self.boto_session.client('iam').get_paginator('list_roles')
+        return sum([len(page['Roles']) for page in paginator.paginate()])
+
+    @property
+    def maximum(self) -> int:
+        try:
+            return super().maximum
+        except self.sq_client.exceptions.NoSuchResourceException:
+            return 1000

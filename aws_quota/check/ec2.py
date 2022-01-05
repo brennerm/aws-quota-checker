@@ -204,7 +204,7 @@ class ElasticIpCountCheck(QuotaCheck):
 
 class TransitGatewayCountCheck(QuotaCheck):
     key = "ec2_tgw_count"
-    description = "Transit Gateways per account"
+    description = "Transit Gateways per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'ec2'
     quota_code = 'L-A2478D36'
@@ -216,7 +216,7 @@ class TransitGatewayCountCheck(QuotaCheck):
 
 class VpnConnectionCountCheck(QuotaCheck):
     key = "ec2_vpn_connection_count"
-    description = "VPN connections per region"
+    description = "VPN connections per Region"
     scope = QuotaScope.REGION
     service_code = 'ec2'
     quota_code = 'L-3E6EC3A3'

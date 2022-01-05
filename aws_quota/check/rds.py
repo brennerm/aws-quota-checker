@@ -2,7 +2,7 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class RDSDBInstanceCountCheck(QuotaCheck):
     key = "rds_instances"
-    description = "RDS instances per region"
+    description = "RDS instances per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-7B6409FD"
@@ -13,7 +13,7 @@ class RDSDBInstanceCountCheck(QuotaCheck):
 
 class RDSDBParameterGroupsCountCheck(QuotaCheck):
     key = "rds_parameter_groups"
-    description = "RDS parameter groups per region"
+    description = "RDS parameter groups per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-DE55804A"
@@ -25,7 +25,7 @@ class RDSDBParameterGroupsCountCheck(QuotaCheck):
 
 class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
     key = "rds_cluster_parameter_groups"
-    description = "RDS cluster parameter groups per region"
+    description = "RDS cluster parameter groups per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-E4C808A8"
@@ -37,7 +37,7 @@ class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
 
 class RDSEventSubscriptions(QuotaCheck):
     key = "rds_event_subscriptions"
-    description = "RDS event subscriptions per region"
+    description = "RDS event subscriptions per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
     quota_code = "L-A59F4C87"

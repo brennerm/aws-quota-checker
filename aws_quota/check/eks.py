@@ -3,7 +3,7 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class ClusterCountCheck(QuotaCheck):
     key = "eks_count"
-    description = "EKS Clusters per region"
+    description = "EKS Clusters per Region"
     scope = QuotaScope.REGION
     service_code = 'eks'
     quota_code = 'L-1194D53C'

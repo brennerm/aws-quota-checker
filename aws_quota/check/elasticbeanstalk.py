@@ -3,7 +3,7 @@ from .quota_check import QuotaCheck, QuotaScope
 
 class ApplicationCountCheck(QuotaCheck):
     key = "elasticbeanstalk_application_count"
-    description = "Elastic Beanstalk Applications per account"
+    description = "Elastic Beanstalk Applications per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'elasticbeanstalk'
     quota_code = 'L-1CEABD17'
@@ -15,7 +15,7 @@ class ApplicationCountCheck(QuotaCheck):
 
 class EnvironmentCountCheck(QuotaCheck):
     key = "elasticbeanstalk_environment_count"
-    description = "Elastic Beanstalk Environments per account"
+    description = "Elastic Beanstalk Environments per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'elasticbeanstalk'
     quota_code = 'L-8EFC1C51'

@@ -59,7 +59,7 @@ def get_all_network_acls(session: boto3.Session) -> typing.List[dict]:
 
 class VpcCountCheck(QuotaCheck):
     key = "vpc_count"
-    description = "VPCs per region"
+    description = "VPCs per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-F678F1CE'
@@ -71,7 +71,7 @@ class VpcCountCheck(QuotaCheck):
 
 class InternetGatewayCountCheck(QuotaCheck):
     key = "ig_count"
-    description = "VPC internet gateways per region"
+    description = "VPC internet gateways per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-A4707A72'
@@ -83,7 +83,7 @@ class InternetGatewayCountCheck(QuotaCheck):
 
 class NetworkInterfaceCountCheck(QuotaCheck):
     key = "ni_count"
-    description = "VPC network interfaces per region"
+    description = "VPC network interfaces per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-DF5E4CA3'
@@ -95,7 +95,7 @@ class NetworkInterfaceCountCheck(QuotaCheck):
 
 class SecurityGroupCountCheck(QuotaCheck):
     key = "sg_count"
-    description = "VPC security groups per region"
+    description = "VPC security groups per Region"
     scope = QuotaScope.REGION
     service_code = 'vpc'
     quota_code = 'L-E79EC296'

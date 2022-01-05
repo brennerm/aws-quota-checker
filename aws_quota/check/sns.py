@@ -7,7 +7,7 @@ from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
 
 class TopicCountCheck(QuotaCheck):
     key = "sns_topics_count"
-    description = "SNS topics per account"
+    description = "SNS topics per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'sns'
     quota_code = 'L-61103206'
@@ -18,7 +18,7 @@ class TopicCountCheck(QuotaCheck):
 
 class PendingSubscriptionCountCheck(QuotaCheck):
     key = "sns_pending_subscriptions_count"
-    description = "Pending SNS subscriptions per account"
+    description = "Pending SNS subscriptions per Account"
     scope = QuotaScope.ACCOUNT
     service_code = 'sns'
     quota_code = 'L-1A43D3DB'

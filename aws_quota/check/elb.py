@@ -24,7 +24,7 @@ def get_nlbs(session: boto3.Session):
 
 class ClassicLoadBalancerCountCheck(QuotaCheck):
     key = "elb_clb_count"
-    description = "Classic Load Balancers per region"
+    description = "Classic Load Balancers per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-E9E9831D'
@@ -64,7 +64,7 @@ class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
 
 class NetworkLoadBalancerCountCheck(QuotaCheck):
     key = "elb_nlb_count"
-    description = "Network Load Balancers per region"
+    description = "Network Load Balancers per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-69A177A2'
@@ -106,7 +106,7 @@ class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
 
 class ApplicationLoadBalancerCountCheck(QuotaCheck):
     key = "elb_alb_count"
-    description = "Application Load Balancers per region"
+    description = "Application Load Balancers per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-53DA6B97'
@@ -141,7 +141,7 @@ class ListenerPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
 
 class TargetGroupCountCheck(QuotaCheck):
     key = "elb_target_group_count"
-    description = "Target Groups per region"
+    description = "Target Groups per Region"
     scope = QuotaScope.REGION
     service_code = 'elasticloadbalancing'
     quota_code = 'L-B22855CB'
