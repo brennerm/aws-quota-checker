@@ -181,7 +181,7 @@ class PrometheusExporter:
                         checks_to_drop.append(e.check)
                     except Exception:
                         logger.error(
-                            'getting maximum of quota %s failed', check)
+                            'getting current value of quota %s failed', check)
 
                 for check in checks_to_drop:
                     self.checks.remove(check)
