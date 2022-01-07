@@ -29,7 +29,7 @@ class QuotaCheck:
 
     def count_paginated_results(self, service: str, method: str, key: str, paginate_args: dict = {}) -> int:
         paginator = self.boto_session.client(service).get_paginator(method)
-        pagination_config = {'PageSize': 1000}
+        pagination_config = {'PageSize': 100}
         page_iterable = paginator.paginate(**{"PaginationConfig": pagination_config, **paginate_args})
         return sum(len(page[key]) for page in page_iterable)
 
