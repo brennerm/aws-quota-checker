@@ -10,4 +10,4 @@ class SnapshotCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_snapshots(OwnerIds=['self'])['Snapshots'])
+        return self.count_paginated_results("ec2", "describe_snapshots", "Snapshots", {"OwnerIds": ["self"]})
