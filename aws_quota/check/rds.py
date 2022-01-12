@@ -1,5 +1,6 @@
 from .quota_check import QuotaCheck, QuotaScope
 
+
 class RDSDBInstanceCountCheck(QuotaCheck):
     key = "rds_instances"
     description = "RDS instances per Region"
@@ -9,7 +10,10 @@ class RDSDBInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results("rds", "describe_db_instances", "DBInstances")
+        return self.count_paginated_results(
+            "rds", "describe_db_instances", "DBInstances"
+        )
+
 
 class RDSDBParameterGroupsCountCheck(QuotaCheck):
     key = "rds_parameter_groups"
@@ -20,7 +24,9 @@ class RDSDBParameterGroupsCountCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results("rds", "describe_db_parameter_groups", "DBParameterGroups")
+        return self.count_paginated_results(
+            "rds", "describe_db_parameter_groups", "DBParameterGroups"
+        )
 
 
 class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
@@ -32,7 +38,9 @@ class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results("rds", "describe_db_cluster_parameter_groups", "DBClusterParameterGroups")
+        return self.count_paginated_results(
+            "rds", "describe_db_cluster_parameter_groups", "DBClusterParameterGroups"
+        )
 
 
 class RDSEventSubscriptions(QuotaCheck):
@@ -44,7 +52,10 @@ class RDSEventSubscriptions(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results("rds", "describe_event_subscriptions", "EventSubscriptionsList")
+        return self.count_paginated_results(
+            "rds", "describe_event_subscriptions", "EventSubscriptionsList"
+        )
+
 
 class RDSDBSnapshotsCheck(QuotaCheck):
     key = "rds_db_snapshots"
@@ -55,4 +66,6 @@ class RDSDBSnapshotsCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results("rds", "describe_db_snapshots", "DBSnapshots", {"SnapshotType": "manual"})
+        return self.count_paginated_results(
+            "rds", "describe_db_snapshots", "DBSnapshots", {"SnapshotType": "manual"}
+        )
