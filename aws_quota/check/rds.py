@@ -45,3 +45,14 @@ class RDSEventSubscriptions(QuotaCheck):
     @property
     def current(self) -> int:
         return self.count_paginated_results("rds", "describe_event_subscriptions", "EventSubscriptionsList")
+
+class RDSDBSnapshotsCheck(QuotaCheck):
+    key = "rds_db_snapshots"
+    description = "Manual DB instance snapshots per Region"
+    service_code = "rds"
+    scope = QuotaScope.REGION
+    quota_code = "L-272F1212"
+
+    @property
+    def current(self) -> int:
+        return self.count_paginated_results("rds", "describe_db_snapshots", "DBSnapshots", {"SnapshotType": "manual"})
