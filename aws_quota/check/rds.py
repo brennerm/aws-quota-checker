@@ -69,3 +69,17 @@ class RDSDBSnapshotsCheck(QuotaCheck):
         return self.count_paginated_results(
             "rds", "describe_db_snapshots", "DBSnapshots", {"SnapshotType": "manual"}
         )
+
+
+class RDSDBClusterSnapshotsCheck(QuotaCheck):
+    key = "rds_db_cluster_snapshots"
+    description = "Manual DB cluster snapshots per Region"
+    service_code = "rds"
+    scope = QuotaScope.REGION
+    quota_code = "L-9B510759"
+
+    @property
+    def current(self) -> int:
+        return self.count_paginated_results(
+            "rds", "describe_db_cluster_snapshots", "DBClusterSnapshots", {"SnapshotType": "manual"}
+        )
