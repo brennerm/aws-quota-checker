@@ -58,7 +58,7 @@ class RDSEventSubscriptions(QuotaCheck):
 
 
 class RDSDBSnapshotsCheck(QuotaCheck):
-    key = "rds_db_snapshots"
+    key = "rds_instance_snapshots"
     description = "Manual DB instance snapshots per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
@@ -72,7 +72,7 @@ class RDSDBSnapshotsCheck(QuotaCheck):
 
 
 class RDSDBClusterSnapshotsCheck(QuotaCheck):
-    key = "rds_db_cluster_snapshots"
+    key = "rds_cluster_snapshots"
     description = "Manual DB cluster snapshots per Region"
     service_code = "rds"
     scope = QuotaScope.REGION
