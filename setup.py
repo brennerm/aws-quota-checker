@@ -1,9 +1,8 @@
-from os import path
+from pathlib import Path
 from setuptools import setup, find_packages
 
-this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+readme_file = Path(__file__).parent.resolve() / 'README.md'
+long_description = readme_file.read_text()
 
 setup(
     name='aws-quota-checker',
