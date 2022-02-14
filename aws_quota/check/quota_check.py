@@ -22,38 +22,56 @@ class QuotaCheck:
         super().__init__()
 
         self.boto_session = boto_session
-        self.sq_client = boto_session.client('service-quotas')
+        self.sq_client = boto_session.client("service-quotas")
 
     def __str__(self) -> str:
-        return f'{self.key}{self.label_values}'
+        return f"{self.key}{self.label_values}"
 
-    def count_paginated_results(self, service: str, method: str, key: str, paginate_args: dict = {}) -> int:
-        paginator = self.boto_session.client(service).get_paginator(method)
-        pagination_config = {'PageSize': 100}
-        page_iterable = paginator.paginate(**{"PaginationConfig": pagination_config, **paginate_args})
+    @staticmethod
+    def count_paginated_results(
+        session: boto3.Session,
+        service: str,
+        method: str,
+        key: str,
+        paginate_args: dict = {},
+        page_size: int = None,
+    ) -> int:
+        paginator = session.client(service).get_paginator(method)
+
+        page_iterable = paginator.paginate(
+            **{
+                "PaginationConfig": {"PageSize": page_size},
+                **paginate_args,
+            }
+        )
         return sum(len(page[key]) for page in page_iterable)
 
     @property
     def label_values(self):
-        label_values = {
-            'quota': self.key,
-            'account': get_account_id(self.boto_session)
-        }
+        label_values = {"quota": self.key, "account": get_account_id(self.boto_session)}
 
         if self.scope in (QuotaScope.REGION, QuotaScope.INSTANCE):
-            label_values['region'] = self.boto_session.region_name
+            label_values["region"] = self.boto_session.region_name
 
         if self.scope == QuotaScope.INSTANCE:
-            label_values['instance'] = self.instance_id
+            label_values["instance"] = self.instance_id
 
         return label_values
 
     @property
     def maximum(self) -> int:
         try:
-            return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            return int(
+                self.sq_client.get_service_quota(
+                    ServiceCode=self.service_code, QuotaCode=self.quota_code
+                )["Quota"]["Value"]
+            )
         except self.sq_client.exceptions.NoSuchResourceException:
-            return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            return int(
+                self.sq_client.get_aws_default_service_quota(
+                    ServiceCode=self.service_code, QuotaCode=self.quota_code
+                )["Quota"]["Value"]
+            )
 
     @property
     def current(self) -> int:

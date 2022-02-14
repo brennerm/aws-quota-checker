@@ -6,20 +6,20 @@ import cachetools
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_running_ec2_instances(session: boto3.Session):
-    return [instance for reservations in session.client('ec2').describe_instances(
-            Filters=[
-                {
-                    'Name': 'instance-state-name',
-                    'Values': ['running']
-                }
-            ]
-            )['Reservations'] for instance in reservations['Instances']]
+    return [
+        instance
+        for reservations in session.client("ec2").describe_instances(
+            Filters=[{"Name": "instance-state-name", "Values": ["running"]}]
+        )["Reservations"]
+        for instance in reservations["Instances"]
+    ]
 
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_spot_requests(session: boto3.Session):
-    return session.client('ec2').describe_spot_instance_requests()[
-        'SpotInstanceRequests']
+    return session.client("ec2").describe_spot_instance_requests()[
+        "SpotInstanceRequests"
+    ]
 
 
 class OnDemandStandardInstanceCountCheck(QuotaCheck):
@@ -33,7 +33,15 @@ class OnDemandStandardInstanceCountCheck(QuotaCheck):
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'], instances)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["InstanceType"][0]
+                    in ["a", "c", "d", "h", "i", "m", "r", "t", "z"],
+                    instances,
+                )
+            )
+        )
 
 
 class OnDemandFInstanceCountCheck(QuotaCheck):
@@ -47,7 +55,9 @@ class OnDemandFInstanceCountCheck(QuotaCheck):
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['f'], instances)))
+        return len(
+            list(filter(lambda inst: inst["InstanceType"][0] in ["f"], instances))
+        )
 
 
 class OnDemandGInstanceCountCheck(QuotaCheck):
@@ -61,7 +71,9 @@ class OnDemandGInstanceCountCheck(QuotaCheck):
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['g'], instances)))
+        return len(
+            list(filter(lambda inst: inst["InstanceType"][0] in ["g"], instances))
+        )
 
 
 class OnDemandInfInstanceCountCheck(QuotaCheck):
@@ -75,7 +87,9 @@ class OnDemandInfInstanceCountCheck(QuotaCheck):
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['inf'], instances)))
+        return len(
+            list(filter(lambda inst: inst["InstanceType"][0] in ["inf"], instances))
+        )
 
 
 class OnDemandPInstanceCountCheck(QuotaCheck):
@@ -89,7 +103,9 @@ class OnDemandPInstanceCountCheck(QuotaCheck):
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['p'], instances)))
+        return len(
+            list(filter(lambda inst: inst["InstanceType"][0] in ["p"], instances))
+        )
 
 
 class OnDemandXInstanceCountCheck(QuotaCheck):
@@ -103,7 +119,9 @@ class OnDemandXInstanceCountCheck(QuotaCheck):
     def current(self):
         instances = get_all_running_ec2_instances(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['InstanceType'][0] in ['x'], instances)))
+        return len(
+            list(filter(lambda inst: inst["InstanceType"][0] in ["x"], instances))
+        )
 
 
 class SpotStandardRequestCountCheck(QuotaCheck):
@@ -117,7 +135,15 @@ class SpotStandardRequestCountCheck(QuotaCheck):
     def current(self):
         requests = get_all_spot_requests(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['a', 'c', 'd', 'h', 'i', 'm', 'r', 't', 'z'], requests)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["LaunchSpecification"]["InstanceType"][0]
+                    in ["a", "c", "d", "h", "i", "m", "r", "t", "z"],
+                    requests,
+                )
+            )
+        )
 
 
 class SpotFRequestCountCheck(QuotaCheck):
@@ -131,7 +157,15 @@ class SpotFRequestCountCheck(QuotaCheck):
     def current(self):
         requests = get_all_spot_requests(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['f'], requests)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["LaunchSpecification"]["InstanceType"][0]
+                    in ["f"],
+                    requests,
+                )
+            )
+        )
 
 
 class SpotGRequestCountCheck(QuotaCheck):
@@ -145,7 +179,15 @@ class SpotGRequestCountCheck(QuotaCheck):
     def current(self):
         requests = get_all_spot_requests(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['g'], requests)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["LaunchSpecification"]["InstanceType"][0]
+                    in ["g"],
+                    requests,
+                )
+            )
+        )
 
 
 class SpotInfRequestCountCheck(QuotaCheck):
@@ -159,7 +201,15 @@ class SpotInfRequestCountCheck(QuotaCheck):
     def current(self):
         requests = get_all_spot_requests(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['inf'], requests)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["LaunchSpecification"]["InstanceType"][0]
+                    in ["inf"],
+                    requests,
+                )
+            )
+        )
 
 
 class SpotPRequestCountCheck(QuotaCheck):
@@ -173,7 +223,15 @@ class SpotPRequestCountCheck(QuotaCheck):
     def current(self):
         requests = get_all_spot_requests(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['p'], requests)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["LaunchSpecification"]["InstanceType"][0]
+                    in ["p"],
+                    requests,
+                )
+            )
+        )
 
 
 class SpotXRequestCountCheck(QuotaCheck):
@@ -187,40 +245,54 @@ class SpotXRequestCountCheck(QuotaCheck):
     def current(self):
         requests = get_all_spot_requests(self.boto_session)
 
-        return len(list(filter(lambda inst: inst['LaunchSpecification']['InstanceType'][0] in ['x'], requests)))
+        return len(
+            list(
+                filter(
+                    lambda inst: inst["LaunchSpecification"]["InstanceType"][0]
+                    in ["x"],
+                    requests,
+                )
+            )
+        )
 
 
 class ElasticIpCountCheck(QuotaCheck):
     key = "ec2_eip_count"
     description = "EC2 VPC Elastic IPs"
     scope = QuotaScope.ACCOUNT
-    service_code = 'ec2'
-    quota_code = 'L-0263D0A3'
+    service_code = "ec2"
+    quota_code = "L-0263D0A3"
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_addresses()['Addresses'])
+        return len(self.boto_session.client("ec2").describe_addresses()["Addresses"])
 
 
 class TransitGatewayCountCheck(QuotaCheck):
     key = "ec2_tgw_count"
     description = "Transit Gateways per Account"
     scope = QuotaScope.ACCOUNT
-    service_code = 'ec2'
-    quota_code = 'L-A2478D36'
+    service_code = "ec2"
+    quota_code = "L-A2478D36"
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_transit_gateways()['TransitGateways'])
+        return len(
+            self.boto_session.client("ec2").describe_transit_gateways()[
+                "TransitGateways"
+            ]
+        )
 
 
 class VpnConnectionCountCheck(QuotaCheck):
     key = "ec2_vpn_connection_count"
     description = "VPN connections per Region"
     scope = QuotaScope.REGION
-    service_code = 'ec2'
-    quota_code = 'L-3E6EC3A3'
+    service_code = "ec2"
+    quota_code = "L-3E6EC3A3"
 
     @property
     def current(self):
-        return len(self.boto_session.client('ec2').describe_vpn_connections()['VpnConnections'])
+        return len(
+            self.boto_session.client("ec2").describe_vpn_connections()["VpnConnections"]
+        )

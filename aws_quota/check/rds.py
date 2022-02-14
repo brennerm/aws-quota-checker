@@ -10,8 +10,12 @@ class RDSDBInstanceCountCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results(
-            "rds", "describe_db_instances", "DBInstances"
+        return QuotaCheck.count_paginated_results(
+            self.boto_session,
+            "rds",
+            "describe_db_instances",
+            "DBInstances",
+            page_size=100,
         )
 
 
@@ -24,8 +28,12 @@ class RDSDBParameterGroupsCountCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results(
-            "rds", "describe_db_parameter_groups", "DBParameterGroups"
+        return QuotaCheck.count_paginated_results(
+            self.boto_session,
+            "rds",
+            "describe_db_parameter_groups",
+            "DBParameterGroups",
+            page_size=100,
         )
 
 
@@ -38,8 +46,12 @@ class RDSDBClusterParameterGroupCountCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results(
-            "rds", "describe_db_cluster_parameter_groups", "DBClusterParameterGroups"
+        return QuotaCheck.count_paginated_results(
+            self.boto_session,
+            "rds",
+            "describe_db_cluster_parameter_groups",
+            "DBClusterParameterGroups",
+            page_size=100,
         )
 
 
@@ -52,8 +64,12 @@ class RDSEventSubscriptions(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results(
-            "rds", "describe_event_subscriptions", "EventSubscriptionsList"
+        return QuotaCheck.count_paginated_results(
+            self.boto_session,
+            "rds",
+            "describe_event_subscriptions",
+            "EventSubscriptionsList",
+            page_size=100,
         )
 
 
@@ -66,8 +82,13 @@ class RDSDBSnapshotsCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results(
-            "rds", "describe_db_snapshots", "DBSnapshots", {"SnapshotType": "manual"}
+        return QuotaCheck.count_paginated_results(
+            self.boto_session,
+            "rds",
+            "describe_db_snapshots",
+            "DBSnapshots",
+            {"SnapshotType": "manual"},
+            100,
         )
 
 
@@ -80,6 +101,11 @@ class RDSDBClusterSnapshotsCheck(QuotaCheck):
 
     @property
     def current(self) -> int:
-        return self.count_paginated_results(
-            "rds", "describe_db_cluster_snapshots", "DBClusterSnapshots", {"SnapshotType": "manual"}
+        return QuotaCheck.count_paginated_results(
+            self.boto_session,
+            "rds",
+            "describe_db_cluster_snapshots",
+            "DBClusterSnapshots",
+            {"SnapshotType": "manual"},
+            100,
         )
