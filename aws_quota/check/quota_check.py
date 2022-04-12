@@ -2,6 +2,7 @@ from aws_quota.utils import get_account_id
 import enum
 import typing
 
+import backoff
 import boto3
 
 
@@ -50,10 +51,14 @@ class QuotaCheck:
 
     @property
     def maximum(self) -> int:
-        try:
-            return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
-        except self.sq_client.exceptions.NoSuchResourceException:
-            return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+        @backoff.on_exception(backoff.fibo, self.sq_client.exceptions.TooManyRequestsException, max_value=13)
+        def _maximum() -> int:
+            try:
+                return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+            except self.sq_client.exceptions.NoSuchResourceException:
+                return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+
+        return _maximum()
 
     @property
     def current(self) -> int:
