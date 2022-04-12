@@ -102,7 +102,7 @@ class PrometheusExporter:
                         else:
                             checks.append(chk(self.session))
                     except Exception:
-                        logger.error('failed to collect check %s', chk)
+                        logger.exception('failed to collect check %s', chk)
 
                 g.set(len(checks))
                 self.checks = checks
@@ -140,7 +140,7 @@ class PrometheusExporter:
                             'instance with identifier %s does not exist anymore, dropping it...', e.check.instance_id)
                         checks_to_drop.append(e.check)
                     except Exception:
-                        logger.error(
+                        logger.exception(
                             'getting maximum of quota %s failed', check)
 
                 for check in checks_to_drop:
@@ -180,7 +180,7 @@ class PrometheusExporter:
                             'instance with identifier %s does not exist anymore, dropping it...', e.check.instance_id)
                         checks_to_drop.append(e.check)
                     except Exception:
-                        logger.error(
+                        logger.exception(
                             'getting current value of quota %s failed', check)
 
                 for check in checks_to_drop:
