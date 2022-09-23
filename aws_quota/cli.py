@@ -83,7 +83,7 @@ class Runner:
             result = Runner.ReportResult.ERROR
 
         click.echo(
-            f'{description} [{scope}]: {current if current is not None else "?"}/{maximum if maximum is not None else "?"} ', nl=False)
+            f'{description} ; [{scope}]; {current if current is not None else "?"};{maximum if maximum is not None else "?"} ', nl=False)
 
         click.echo(click.style(symbol, fg=color, bold=True))
 
