@@ -81,6 +81,18 @@ class InternetGatewayCountCheck(QuotaCheck):
         return len(self.boto_session.client('ec2').describe_internet_gateways()['InternetGateways'])
 
 
+class VpcEndpointCountCheck(QuotaCheck):
+    key = "vpc_endpoint"
+    description = "Gateway VPC endpoints per Region"
+    scope = QuotaScope.REGION
+    service_code = 'vpc'
+    quota_code = 'L-1B52E74A'
+
+    @property
+    def current(self):
+        return len(self.boto_session.client('ec2').describe_vpc_endpoints()['VpcEndpoints'])
+
+
 class NetworkInterfaceCountCheck(QuotaCheck):
     key = "ni_count"
     description = "VPC network interfaces per Region"
