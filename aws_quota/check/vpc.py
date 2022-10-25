@@ -117,6 +117,18 @@ class SecurityGroupCountCheck(QuotaCheck):
         return len(self.boto_session.client('ec2').describe_security_groups()['SecurityGroups'])
 
 
+class NatGatewayCountCheck(QuotaCheck):
+    key = "nat_count"
+    description = "NAT gateways per Region"
+    scope = QuotaScope.REGION
+    service_code = 'vpc'
+    quota_code = 'L-FE5A380F'
+
+    @property
+    def current(self):
+        return len(self.boto_session.client('ec2').describe_nat_gateways()['NatGateways'])
+
+
 class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
     key = "vpc_rules_per_sg"
     description = "Rules per VPC security group"
