@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import QuotaCheck, QuotaScope, RegionQuotaCheck
 
 
-class AutoScalingGroupCountCheck(QuotaCheck):
+class AutoScalingGroupCountCheck(RegionQuotaCheck):
     key = "asg_count"
     description = "Auto Scaling groups per Region"
     scope = QuotaScope.REGION
@@ -13,7 +13,7 @@ class AutoScalingGroupCountCheck(QuotaCheck):
         return len(self.boto_session.client('autoscaling').describe_auto_scaling_groups()['AutoScalingGroups'])
 
 
-class LaunchConfigurationCountCheck(QuotaCheck):
+class LaunchConfigurationCountCheck(RegionQuotaCheck):
     key = "lc_count"
     description = "Launch configurations per Region"
     scope = QuotaScope.REGION

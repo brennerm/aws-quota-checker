@@ -1,7 +1,7 @@
 from aws_quota.exceptions import InstanceWithIdentifierNotFound
 import typing
 import boto3
-from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
+from .quota_check import InstanceQuotaCheck, QuotaScope, RegionQuotaCheck
 
 
 def get_albs(session: boto3.Session):
@@ -22,7 +22,7 @@ def get_nlbs(session: boto3.Session):
     )
 
 
-class ClassicLoadBalancerCountCheck(QuotaCheck):
+class ClassicLoadBalancerCountCheck(RegionQuotaCheck):
     key = "elb_clb_count"
     description = "Classic Load Balancers per Region"
     scope = QuotaScope.REGION
@@ -62,7 +62,7 @@ class ListenerPerClassicLoadBalancerCountCheck(InstanceQuotaCheck):
             raise InstanceWithIdentifierNotFound(self) from e
 
 
-class NetworkLoadBalancerCountCheck(QuotaCheck):
+class NetworkLoadBalancerCountCheck(RegionQuotaCheck):
     key = "elb_nlb_count"
     description = "Network Load Balancers per Region"
     scope = QuotaScope.REGION
@@ -104,7 +104,7 @@ class ListenerPerNetworkLoadBalancerCountCheck(InstanceQuotaCheck):
             raise InstanceWithIdentifierNotFound(self) from e
 
 
-class ApplicationLoadBalancerCountCheck(QuotaCheck):
+class ApplicationLoadBalancerCountCheck(RegionQuotaCheck):
     key = "elb_alb_count"
     description = "Application Load Balancers per Region"
     scope = QuotaScope.REGION
@@ -139,7 +139,7 @@ class ListenerPerApplicationLoadBalancerCountCheck(InstanceQuotaCheck):
             raise InstanceWithIdentifierNotFound(self) from e
 
 
-class TargetGroupCountCheck(QuotaCheck):
+class TargetGroupCountCheck(RegionQuotaCheck):
     key = "elb_target_group_count"
     description = "Target Groups per Region"
     scope = QuotaScope.REGION

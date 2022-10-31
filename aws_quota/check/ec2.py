@@ -1,4 +1,4 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import QuotaCheck, QuotaScope, RegionQuotaCheck
 
 import boto3
 import cachetools
@@ -214,7 +214,7 @@ class TransitGatewayCountCheck(QuotaCheck):
         return len(self.boto_session.client('ec2').describe_transit_gateways()['TransitGateways'])
 
 
-class VpnConnectionCountCheck(QuotaCheck):
+class VpnConnectionCountCheck(RegionQuotaCheck):
     key = "ec2_vpn_connection_count"
     description = "VPN connections per Region"
     scope = QuotaScope.REGION

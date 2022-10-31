@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import RegionQuotaCheck, QuotaScope
 
 
-class FunctionAndLayerStorageCheck(QuotaCheck):
+class FunctionAndLayerStorageCheck(RegionQuotaCheck):
     key = "lambda_function_storage"
     description = "Lambda function and layer storage"
     scope = QuotaScope.REGION
