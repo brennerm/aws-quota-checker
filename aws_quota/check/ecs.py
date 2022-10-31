@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import RegionQuotaCheck, QuotaScope
 
 
-class ClusterCountCheck(QuotaCheck):
+class ClusterCountCheck(RegionQuotaCheck):
     key = "ecs_count"
     description = "ECS Clusters per Region"
     scope = QuotaScope.REGION

@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import QuotaScope, RegionQuotaCheck
 
 
-class TableCountCheck(QuotaCheck):
+class TableCountCheck(RegionQuotaCheck):
     key = "dyndb_table_count"
     description = "DynamoDB Tables per Region"
     scope = QuotaScope.REGION

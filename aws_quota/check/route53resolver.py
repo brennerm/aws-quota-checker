@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import RegionQuotaCheck, QuotaScope
 
 
-class EndpointCountCheck(QuotaCheck):
+class EndpointCountCheck(RegionQuotaCheck):
     key = "route53resolver_endpoint_count"
     description = "Route53 Resolver endpoints per Region"
     scope = QuotaScope.REGION
@@ -12,7 +12,8 @@ class EndpointCountCheck(QuotaCheck):
     def current(self):
         return len(self.boto_session.client('route53resolver').list_resolver_endpoints()['ResolverEndpoints'])
 
-class RulesCountCheck(QuotaCheck):
+
+class RulesCountCheck(RegionQuotaCheck):
     key = "route53resolver_rule_count"
     description = "Route53 Resolver rules per Region"
     scope = QuotaScope.REGION
@@ -23,7 +24,8 @@ class RulesCountCheck(QuotaCheck):
     def current(self):
         return len(self.boto_session.client('route53resolver').list_resolver_rules()['ResolverRules'])
 
-class RuleAssociationsCountCheck(QuotaCheck):
+
+class RuleAssociationsCountCheck(RegionQuotaCheck):
     key = "route53resolver_rule_association_count"
     description = "Route53 Resolver rule associations per Region"
     scope = QuotaScope.REGION

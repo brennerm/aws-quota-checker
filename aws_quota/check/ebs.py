@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import RegionQuotaCheck, QuotaScope
 
 
-class SnapshotCountCheck(QuotaCheck):
+class SnapshotCountCheck(RegionQuotaCheck):
     key = "ebs_snapshot_count"
     description = "EBS Snapshots per Region"
     scope = QuotaScope.REGION

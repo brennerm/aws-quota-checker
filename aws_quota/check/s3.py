@@ -1,7 +1,7 @@
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import RegionQuotaCheck, QuotaScope
 
 
-class BucketCountCheck(QuotaCheck):
+class BucketCountCheck(RegionQuotaCheck):
     key = "s3_bucket_count"
     description = "S3 Buckets per Account"
     scope = QuotaScope.REGION
