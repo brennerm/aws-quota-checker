@@ -7,7 +7,7 @@ import boto3
 import click
 import tabulate
 
-from aws_quota.check.quota_check import InstanceQuotaCheck, QuotaCheck, QuotaScope
+from aws_quota.check.quota_check import RegionQuotaCheck, InstanceQuotaCheck, QuotaCheck, QuotaScope
 from aws_quota.check import ALL_CHECKS, ALL_INSTANCE_SCOPED_CHECKS
 
 logger = logging.getLogger(__name__)
@@ -36,6 +36,13 @@ def check_keys_to_check_classes(check_string: str):
 
     return list(
         filter(lambda c: c.key not in blacklisted_check_keys, selected_checks))
+
+
+def check_regions(regions: str):
+    if regions is not None:
+        return regions.split(',')
+    else:
+        return regions
 
 
 class Runner:
@@ -110,7 +117,7 @@ class Runner:
             if chk.scope == QuotaScope.ACCOUNT:
                 scope = get_account_id(self.session)
             elif chk.scope == QuotaScope.REGION:
-                scope = f'{get_account_id(self.session)}/{self.session.region_name}'
+                scope = f'{get_account_id(self.session)}/{chk.region}'
             elif chk.scope == QuotaScope.INSTANCE:
                 scope = f'{get_account_id(self.session)}/{self.session.region_name}/{chk.instance_id}'
 
@@ -139,7 +146,7 @@ def cli(debug):
 
 def common_scope_options(function):
     function = click.option(
-        '--region', help='Region to use for region scoped quotas, defaults to current')(function)
+        '--regions', help='Regions to use for region scoped quotas,comma separated, defaults to current')(function)
     function = click.option(
         '--profile', help='AWS profile name to use, defaults to current')(function)
 
@@ -161,7 +168,7 @@ def common_check_options(function):
 @common_scope_options
 @common_check_options
 @click.argument('check-keys')
-def check(check_keys, region, profile, warning_threshold, error_threshold, fail_on_warning):
+def check(check_keys, regions, profile, warning_threshold, error_threshold, fail_on_warning):
     """Run checks identified by CHECK_KEYS
 
     e.g. check vpc_count,ecs_count
@@ -178,7 +185,12 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
 
     selected_checks = check_keys_to_check_classes(check_keys)
 
-    session = boto3.Session(region_name=region, profile_name=profile)
+    regions = check_regions(regions)
+
+    if regions is not None:
+        session = boto3.Session(region_name=regions[0], profile_name=profile)
+    else:
+        session = boto3.Session(region_name=regions, profile_name=profile)
 
     click.echo(
         f'AWS profile: {session.profile_name} | AWS region: {session.region_name} | Active checks: {",".join([check.key for check in selected_checks])}')
@@ -192,6 +204,13 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
                     checks.append(
                         chk(session, identifier)
                     )
+            elif issubclass(chk, RegionQuotaCheck):
+                try:
+                    for rg in regions:
+                        session = boto3.Session(region_name=rg, profile_name=profile)
+                        checks.append(chk(session, rg))
+                except TypeError:
+                    checks.append(chk(session, region=session.region_name))
             else:
                 checks.append(chk(session))
 
@@ -234,7 +253,7 @@ def check_instance(check_key, instance_id, region, profile, warning_threshold, e
 @click.option('--reload-checks-interval', help='Interval in seconds at which to collect new checks e.g. when a new resource has been created, defaults to 600', default=600)
 @click.option('--enable-duration-metrics/--disable-duration-metrics', help='Flag to control whether to collect/expose duration metrics, defaults to true', default=True)
 @click.argument('check-keys')
-def prometheus_exporter(check_keys, region, profile, port, namespace, limits_check_interval, currents_check_interval, reload_checks_interval, enable_duration_metrics):
+def prometheus_exporter(check_keys, regions, profile, port, namespace, limits_check_interval, currents_check_interval, reload_checks_interval, enable_duration_metrics):
     """Start a Prometheus exporter for quota checks
 
     Set checks to execute with CHECK_KEYS
@@ -253,7 +272,12 @@ def prometheus_exporter(check_keys, region, profile, port, namespace, limits_che
 
     selected_checks = check_keys_to_check_classes(check_keys)
 
-    session = boto3.Session(region_name=region, profile_name=profile)
+    regions = check_regions(regions)
+
+    if regions is not None:
+        session = boto3.Session(region_name=regions[0], profile_name=profile)
+    else:
+        session = boto3.Session(region_name=regions, profile_name=profile)
 
     click.echo(
         f'AWS profile: {session.profile_name} | AWS region: {session.region_name} | Active checks: {",".join([check.key for check in selected_checks])}')
@@ -267,7 +291,7 @@ def prometheus_exporter(check_keys, region, profile, port, namespace, limits_che
         enable_duration_metrics=enable_duration_metrics
     )
 
-    PrometheusExporter(session, selected_checks, settings).start()
+    PrometheusExporter(session, selected_checks, regions, settings).start()
 
 
 @cli.command()

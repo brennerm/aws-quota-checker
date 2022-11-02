@@ -45,7 +45,6 @@ class QuotaCheck:
 
         if self.scope == QuotaScope.INSTANCE:
             label_values['instance'] = self.instance_id
-
         return label_values
 
     @property
@@ -72,3 +71,13 @@ class InstanceQuotaCheck(QuotaCheck):
     @staticmethod
     def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
         raise NotImplementedError
+
+
+class RegionQuotaCheck(QuotaCheck):
+    scope = QuotaScope.REGION
+    instance_id: str = None
+
+    def __init__(self, session, region) -> None:
+        super().__init__(session)
+
+        self.region = region

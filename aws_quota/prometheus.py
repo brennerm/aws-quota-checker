@@ -3,12 +3,11 @@ from aws_quota.exceptions import InstanceWithIdentifierNotFound
 from aws_quota.utils import get_account_id
 import dataclasses
 import logging
-import signal
 import time
 import contextlib
 import typing
 
-from aws_quota.check.quota_check import InstanceQuotaCheck, QuotaCheck
+from aws_quota.check.quota_check import InstanceQuotaCheck, RegionQuotaCheck, QuotaCheck
 
 import boto3
 import prometheus_client as prom
@@ -30,10 +29,12 @@ class PrometheusExporter:
     def __init__(self,
                  session: boto3.Session,
                  check_classes: typing.List[QuotaCheck],
+                 regions,
                  settings: PrometheusExporterSettings):
         self.session = session
         self.check_classes = check_classes
         self.checks = []
+        self.regions = regions
         self.settings = settings
 
         # unregister default collectors
@@ -99,6 +100,10 @@ class PrometheusExporter:
                                 checks.append(
                                     chk(self.session, identifier)
                                 )
+                        elif issubclass(chk, RegionQuotaCheck):
+                            for rg in self.regions:
+                                self.session = boto3.Session(region_name=rg)
+                                checks.append(chk(self.session, rg))
                         else:
                             checks.append(chk(self.session))
                     except Exception:

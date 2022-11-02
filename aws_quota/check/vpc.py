@@ -4,7 +4,7 @@ import typing
 import boto3
 import botocore.exceptions
 import cachetools
-from .quota_check import QuotaCheck, InstanceQuotaCheck, QuotaScope
+from .quota_check import InstanceQuotaCheck, RegionQuotaCheck, QuotaScope
 
 
 def check_if_vpc_exists(session: boto3.Session, vpc_id: str) -> bool:
@@ -57,7 +57,7 @@ def get_all_network_acls(session: boto3.Session) -> typing.List[dict]:
     return session.client('ec2').describe_network_acls()['NetworkAcls']
 
 
-class VpcCountCheck(QuotaCheck):
+class VpcCountCheck(RegionQuotaCheck):
     key = "vpc_count"
     description = "VPCs per Region"
     scope = QuotaScope.REGION
@@ -69,7 +69,7 @@ class VpcCountCheck(QuotaCheck):
         return len(get_all_vpcs(self.boto_session))
 
 
-class InternetGatewayCountCheck(QuotaCheck):
+class InternetGatewayCountCheck(RegionQuotaCheck):
     key = "ig_count"
     description = "VPC internet gateways per Region"
     scope = QuotaScope.REGION
@@ -81,7 +81,19 @@ class InternetGatewayCountCheck(QuotaCheck):
         return len(self.boto_session.client('ec2').describe_internet_gateways()['InternetGateways'])
 
 
-class NetworkInterfaceCountCheck(QuotaCheck):
+class VpcEndpointCountCheck(RegionQuotaCheck):
+    key = "vpc_endpoint"
+    description = "Gateway VPC endpoints per Region"
+    scope = QuotaScope.REGION
+    service_code = 'vpc'
+    quota_code = 'L-1B52E74A'
+
+    @property
+    def current(self):
+        return len(self.boto_session.client('ec2').describe_vpc_endpoints()['VpcEndpoints'])
+
+
+class NetworkInterfaceCountCheck(RegionQuotaCheck):
     key = "ni_count"
     description = "VPC network interfaces per Region"
     scope = QuotaScope.REGION
@@ -93,7 +105,7 @@ class NetworkInterfaceCountCheck(QuotaCheck):
         return len(self.boto_session.client('ec2').describe_network_interfaces()['NetworkInterfaces'])
 
 
-class SecurityGroupCountCheck(QuotaCheck):
+class SecurityGroupCountCheck(RegionQuotaCheck):
     key = "sg_count"
     description = "VPC security groups per Region"
     scope = QuotaScope.REGION
@@ -103,6 +115,18 @@ class SecurityGroupCountCheck(QuotaCheck):
     @property
     def current(self):
         return len(self.boto_session.client('ec2').describe_security_groups()['SecurityGroups'])
+
+
+class NatGatewayCountCheck(RegionQuotaCheck):
+    key = "nat_count"
+    description = "NAT gateways per Region"
+    scope = QuotaScope.REGION
+    service_code = 'vpc'
+    quota_code = 'L-FE5A380F'
+
+    @property
+    def current(self):
+        return len(self.boto_session.client('ec2').describe_nat_gateways()['NatGateways'])
 
 
 class RulesPerSecurityGroupCheck(InstanceQuotaCheck):

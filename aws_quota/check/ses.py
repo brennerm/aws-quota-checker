@@ -1,8 +1,7 @@
-import boto3
-from .quota_check import QuotaCheck, QuotaScope
+from .quota_check import RegionQuotaCheck, QuotaScope
 
 
-class TopicCountCheck(QuotaCheck):
+class TopicCountCheck(RegionQuotaCheck):
     key = "ses_daily_sends"
     description = "SES messages sent during the last 24 hours"
     scope = QuotaScope.REGION
