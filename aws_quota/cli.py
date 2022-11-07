@@ -42,6 +42,8 @@ def check_regions(regions: str):
     if regions is not None:
         return regions.split(',')
     else:
+        client = boto3.client('ec2')
+        regions = [region['RegionName'] for region in client.describe_regions()['Regions']]
         return regions
 
 
@@ -146,7 +148,7 @@ def cli(debug):
 
 def common_scope_options(function):
     function = click.option(
-        '--regions', help='Regions to use for region scoped quotas,comma separated, defaults to current')(function)
+        '--regions', help='Regions to use for region scoped quotas,comma separated, defaults to all regions')(function)
     function = click.option(
         '--profile', help='AWS profile name to use, defaults to current')(function)
 
