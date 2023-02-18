@@ -1,9 +1,11 @@
 from aws_quota.utils import get_account_id
 import enum
 import typing
-
+import logging
 import boto3
 
+logger = logging.getLogger(__name__)
+import boto3
 
 class QuotaScope(enum.Enum):
     ACCOUNT = 0
@@ -37,7 +39,8 @@ class QuotaCheck:
     def label_values(self):
         label_values = {
             'quota': self.key,
-            'account': get_account_id(self.boto_session)
+            # 'account': get_account_id(self.boto_session),
+            'profile_name': self.boto_session.profile_name
         }
 
         if self.scope in (QuotaScope.REGION, QuotaScope.INSTANCE):
@@ -50,10 +53,18 @@ class QuotaCheck:
 
     @property
     def maximum(self) -> int:
+        logger.info(f"getting quota limit {self.key}, {self.boto_session.profile_name}")
         try:
             return int(self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
         except self.sq_client.exceptions.NoSuchResourceException:
             return int(self.sq_client.get_aws_default_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota']['Value'])
+        except self.sq_client.exceptions.TooManyRequestsException:
+            import time
+            logger.info("Retrying getting quota limit")
+            time.sleep(2)
+            return int(
+                self.sq_client.get_service_quota(ServiceCode=self.service_code, QuotaCode=self.quota_code)['Quota'][
+                    'Value'])
 
     @property
     def current(self) -> int:

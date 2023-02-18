@@ -120,7 +120,8 @@ class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
     def current(self):
         try:
             sg = get_sg_by_id(self.boto_session, self.instance_id)
-            return len(sg['IpPermissions']) + len(sg['IpPermissionsEgress'])
+            return sum(len(permission['IpRanges']) for permission in
+                       (sg['IpPermissions'] + (sg['IpPermissionsEgress'])))
         except KeyError:
             raise InstanceWithIdentifierNotFound(self)
 
@@ -163,7 +164,7 @@ class RoutesPerRouteTableCheck(InstanceQuotaCheck):
     def current(self):
         try:
             rt = get_rt_by_id(self.boto_session, self.instance_id)
-            return len(rt['Routes'])
+            return len([route for route in rt['Routes'] if route['Origin'] != 'EnableVgwRoutePropagation' ])
         except KeyError:
             raise InstanceWithIdentifierNotFound(self)
 

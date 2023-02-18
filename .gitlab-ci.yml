@@ -1,0 +1,14 @@
+variables:
+  DOCKER_PUSH_CI_MERGE_REQUEST: 0
+
+stages:
+    - build
+
+include:
+  - project: devops/ci/global
+    file: .build_image.yml
+    ref: master
+
+image:build:
+  extends:
+    - .build_image
