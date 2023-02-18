@@ -121,7 +121,7 @@ class RulesPerSecurityGroupCheck(InstanceQuotaCheck):
         try:
             sg = get_sg_by_id(self.boto_session, self.instance_id)
             return sum(len(permission['IpRanges']) for permission in
-                       (sg['IpPermissions'] + (sg['IpPermissionsEgress'])))
+                       (sg['IpPermissions'] + sg['IpPermissionsEgress']))
         except KeyError:
             raise InstanceWithIdentifierNotFound(self)
 
