@@ -28,14 +28,16 @@ class PrometheusExporterSettings:
 
 class PrometheusExporter:
     def __init__(self,
-                 session: boto3.Session,
                  check_classes: typing.List[QuotaCheck],
                  settings: PrometheusExporterSettings):
-        self.session = session
         self.check_classes = check_classes
         self.checks = []
         self.settings = settings
 
+        self.profiles = boto3.session.Session().available_profiles
+        self.profiles.remove('default')
+        logger.info(msg='Listing available profiles')
+        logger.info(msg=self.profiles)
         # unregister default collectors
         for name in list(prom.REGISTRY._names_to_collectors.values()):
             with contextlib.suppress(KeyError):
@@ -48,8 +50,8 @@ class PrometheusExporter:
     @property
     def default_labels(self):
         return {
-            'account': get_account_id(self.session),
-            'region': self.session.region_name
+            'account': 'itrf',
+            'region': 'eu-north-1'
         }
 
     @contextlib.contextmanager
@@ -84,45 +86,46 @@ class PrometheusExporter:
             f'{self.settings.namespace}_check_count',
             documentation='Number of AWS Quota Checks'
         )
-
         while True:
             with self.timeit_gauge(
                 f'{self.settings.namespace}_collect_checks',
                 documentation='Time to collect all quota checks'
             ):
-                logger.info('collecting checks')
+                logger.info('Collecting checks')
                 checks = []
-                for chk in self.check_classes:
-                    try:
-                        if issubclass(chk, InstanceQuotaCheck):
-                            for identifier in chk.get_all_identifiers(self.session):
-                                checks.append(
-                                    chk(self.session, identifier)
-                                )
-                        else:
-                            checks.append(chk(self.session))
-                    except Exception:
-                        logger.error('failed to collect check %s', chk)
-
+                for profile in self.profiles:
+                    session = boto3.Session(profile_name=str(profile))
+                    for chk in self.check_classes:
+                        try:
+                            if issubclass(chk, InstanceQuotaCheck):
+                                for identifier in chk.get_all_identifiers(session):
+                                    checks.append(
+                                        chk(session, identifier)
+                                    )
+                            else:
+                                checks.append(chk(session))
+                                logger.info('Appended check for profile %s, region is %s, check is %s',
+                                            profile, session.region_name, str(chk))
+                        except Exception as ex:
+                            logger.error('failed to collect check %s. %s', chk, ex)
                 g.set(len(checks))
                 self.checks = checks
                 logger.info(f'collected {len(checks)} checks')
             await asyncio.sleep(self.settings.reload_checks_interval)
 
     async def get_limits_job(self):
-
         while True:
             with self.timeit_gauge(
                 f'{self.settings.namespace}_check_limits',
                 documentation='Time to check limits of all quotas'
             ):
-                logger.info('refreshing limits')
+                logger.info(f'refreshing {len(self.checks)} limits')
                 checks_to_drop = []
 
                 for check in self.checks:
                     labels = check.label_values
+                    logger.info(str(labels))
                     name = f'{self.settings.namespace}_{check.key}_limit'
-
                     try:
                         with self.timeit_gauge(
                             name,
@@ -139,24 +142,24 @@ class PrometheusExporter:
                         logger.warn(
                             'instance with identifier %s does not exist anymore, dropping it...', e.check.instance_id)
                         checks_to_drop.append(e.check)
-                    except Exception:
+                    except Exception as ex:
                         logger.error(
                             'getting maximum of quota %s failed', check)
+                        logger.error(ex)
 
                 for check in checks_to_drop:
                     self.checks.remove(check)
 
             logger.info('limits refreshed')
+
             await asyncio.sleep(self.settings.get_limits_interval)
 
     async def get_currents_job(self):
-
         while True:
             with self.timeit_gauge(
                 f'{self.settings.namespace}_check_currents',
                 documentation='Time to check limits of all quotas'
             ):
-
                 logger.info('refreshing current values')
                 checks_to_drop = []
                 for check in self.checks:

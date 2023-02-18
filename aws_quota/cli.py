@@ -177,7 +177,6 @@ def check(check_keys, region, profile, warning_threshold, error_threshold, fail_
     For instance checks it'll run through each individual instance available"""
 
     selected_checks = check_keys_to_check_classes(check_keys)
-
     session = boto3.Session(region_name=region, profile_name=profile)
 
     click.echo(
@@ -252,11 +251,8 @@ def prometheus_exporter(check_keys, region, profile, port, namespace, limits_che
     from aws_quota.prometheus import PrometheusExporter, PrometheusExporterSettings
 
     selected_checks = check_keys_to_check_classes(check_keys)
-
-    session = boto3.Session(region_name=region, profile_name=profile)
-
     click.echo(
-        f'AWS profile: {session.profile_name} | AWS region: {session.region_name} | Active checks: {",".join([check.key for check in selected_checks])}')
+        f'Active checks: {",".join([check.key for check in selected_checks])}')
 
     settings = PrometheusExporterSettings(
         port=port,
@@ -266,8 +262,7 @@ def prometheus_exporter(check_keys, region, profile, port, namespace, limits_che
         reload_checks_interval=reload_checks_interval,
         enable_duration_metrics=enable_duration_metrics
     )
-
-    PrometheusExporter(session, selected_checks, settings).start()
+    PrometheusExporter(selected_checks, settings).start()
 
 
 @cli.command()
@@ -276,6 +271,10 @@ def list_checks():
     click.echo(tabulate.tabulate([(chk.key, chk.description, chk.scope.name, getattr(chk, 'instance_id', 'N/A'))
                                   for chk in ALL_CHECKS], headers=['Key', 'Description', 'Scope', 'Instance ID']))
 
+@cli.command()
+def list_profiles():
+    for profile in boto3.session.Session().available_profiles:
+        logger.info(profile)
 
 if __name__ == '__main__':
     cli()
