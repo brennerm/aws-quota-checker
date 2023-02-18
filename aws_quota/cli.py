@@ -228,7 +228,7 @@ def check_instance(check_key, instance_id, region, profile, warning_threshold, e
 @common_scope_options
 @click.option('--port', help='Port on which to expose the Prometheus /metrics endpoint, defaults to 8080', default=8080)
 @click.option('--namespace', help='Namespace/prefix for Prometheus metrics, defaults to awsquota', default='awsquota')
-@click.option('--limits-check-interval', help='Interval in seconds at which to check the limit quota value, defaults to 600', default=1800)
+@click.option('--limits-check-interval', help='Interval in seconds at which to check the limit quota value, defaults to 600', default=600)
 @click.option('--currents-check-interval', help='Interval in seconds at which to check the current quota value, defaults to 300', default=300)
 @click.option('--reload-checks-interval', help='Interval in seconds at which to collect new checks e.g. when a new resource has been created, defaults to 600', default=600)
 @click.option('--enable-duration-metrics/--disable-duration-metrics', help='Flag to control whether to collect/expose duration metrics, defaults to true', default=True)
