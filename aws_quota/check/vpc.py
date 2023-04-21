@@ -29,6 +29,14 @@ def get_vpc_by_id(session: boto3.Session, vpc_id: str) -> dict:
 
 
 @cachetools.cached(cache=cachetools.TTLCache(1, 60))
+def get_vpc_peering_connections(session: boto3.Session) -> typing.List[dict]:
+    return session.client('ec2').describe_vpc_peering_connections(
+            Filters=[
+                {'Name': 'status-code', 'Values': ['active']},
+            ]
+         )['VpcPeeringConnections']
+
+@cachetools.cached(cache=cachetools.TTLCache(1, 60))
 def get_all_sgs(session: boto3.Session) -> typing.List[dict]:
     return session.client('ec2').describe_security_groups()['SecurityGroups']
 
@@ -273,5 +281,31 @@ class Ipv6CidrBlocksPerVpcCheck(InstanceQuotaCheck):
                 return 0
 
             return len(list(filter(lambda cbas: cbas['Ipv6CidrBlockState']['State'] == 'associated', vpc['Ipv6CidrBlockAssociationSet'])))
+        except KeyError:
+            raise InstanceWithIdentifierNotFound(self)
+
+class ActiveVpcPeeringConnectionsPerVpcCheck(InstanceQuotaCheck):
+    key = "vpc_peering_connections_per_vpc"
+    description = "Active VPC peering connections per VPC"
+    service_code = 'vpc'
+    quota_code = 'L-7E9ECCDB'
+    instance_id = 'VPC ID'
+
+    @staticmethod
+    def get_all_identifiers(session: boto3.Session) -> typing.List[str]:
+        return [vpc['VpcId'] for vpc in get_all_vpcs(session)]
+
+    @property
+    def current(self) -> int:
+        peering_connections_per_vpc = 0
+        try:
+            vpc = get_vpc_by_id(self.boto_session, self.instance_id)
+            vpc_peering_connections = get_vpc_peering_connections(self.boto_session)
+            for peering_connection in vpc_peering_connections:
+                for vpc_info in [peering_connection['AccepterVpcInfo'], peering_connection['RequesterVpcInfo']]:
+                    if vpc_info['VpcId'] == vpc['VpcId'] and self.boto_session.region_name == vpc_info['Region']:
+                        peering_connections_per_vpc += 1
+
+            return peering_connections_per_vpc
         except KeyError:
             raise InstanceWithIdentifierNotFound(self)
