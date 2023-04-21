@@ -17,6 +17,8 @@ class QuotaCheck:
     scope: QuotaScope = None
     service_code: str = None
     quota_code: str = None
+    warning_threshold: float = None
+    error_threshold: float = None
 
     def __init__(self, boto_session: boto3.Session) -> None:
         super().__init__()
