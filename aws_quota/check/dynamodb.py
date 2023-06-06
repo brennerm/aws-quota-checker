@@ -10,4 +10,4 @@ class TableCountCheck(QuotaCheck):
 
     @property
     def current(self):
-        return len(self.boto_session.client('dynamodb').list_tables()['TableNames'])
+        return self.count_paginated_results("dynamodb", "list_tables", "TableNames" )
