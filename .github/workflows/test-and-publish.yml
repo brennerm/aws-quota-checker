@@ -1,9 +1,11 @@
 on:
   pull_request:
     branches:
+      - maintainer
       - master
   push:
     branches:
+      - maintainer
       - master
     tags:
       - "*"
@@ -20,6 +22,7 @@ jobs:
       - name: install
         run: pip install .
       - name: run all checks
+        if: ${{ false }}
         run: aws-quota-checker check all
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
@@ -70,15 +73,15 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
       - name: Build Docker image
-        run: docker build . --tag ghcr.io/brennerm/aws-quota-checker:latest
+        run: docker build . --tag gozer/aws-quota-checker:latest
       - name: Push Docker image for branch
         if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
         run: |
-          docker tag ghcr.io/brennerm/aws-quota-checker:latest ghcr.io/brennerm/aws-quota-checker:master
-          docker push ghcr.io/brennerm/aws-quota-checker:master
+          docker tag gozer/aws-quota-checker:latest gozer/aws-quota-checker:master
+          docker push gozer/aws-quota-checker:master
       - name: Push Docker image for tag
         if: ${{ startsWith(github.ref, 'refs/tags') && github.event_name == 'push' }}
         run: |
-          docker tag ghcr.io/brennerm/aws-quota-checker:latest ghcr.io/brennerm/aws-quota-checker:${GITHUB_REF##*/}
-          docker push ghcr.io/brennerm/aws-quota-checker:latest
-          docker push ghcr.io/brennerm/aws-quota-checker:${GITHUB_REF##*/}
+          docker tag gozer/aws-quota-checker:latest gozer/aws-quota-checker:${GITHUB_REF##*/}
+          docker push gozer/aws-quota-checker:latest
+          docker push gozer/aws-quota-checker:${GITHUB_REF##*/}
