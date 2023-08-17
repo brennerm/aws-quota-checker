@@ -9,4 +9,4 @@ aws-quota-checker = {editable = true, extras = ["dev"], path = "."}
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3"
