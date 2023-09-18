@@ -74,15 +74,15 @@ jobs:
       - name: Build Docker image
         run: docker build . --tag gravitational/aws-quota-checker:latest
       - name: Push Docker image for branch
-        if: ${{ github.ref == 'refs/heads/maintainer' && github.event_name == 'push' }}
+        if: ${{ github.ref == 'refs/heads/teleport' && github.event_name == 'push' }}
         run: |
-          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:maintainer
-          docker push gravitational/aws-quota-checker:maintainer
+          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:teleport
+          docker push gravitational/aws-quota-checker:teleport
       - name: Push Docker image for branch
-        if: ${{ github.ref == 'refs/heads/maintainer' && github.event_name == 'push' }}
+        if: ${{ github.ref == 'refs/heads/teleport' && github.event_name == 'push' }}
         run: |
-          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:maintainer
-          docker push gravitational/aws-quota-checker:maintainer
+          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:teleport
+          docker push gravitational/aws-quota-checker:teleport
       - name: Push Docker image for tag
         if: ${{ startsWith(github.ref, 'refs/tags') && github.event_name == 'push' }}
         run: |
