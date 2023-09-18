@@ -1,12 +1,12 @@
 on:
   pull_request:
     branches:
-      - maintainer
-      - maintainer
+      - teleport
+      - master
   push:
     branches:
-      - maintainer
-      - maintainer
+      - teleport
+      - master
     tags:
       - "*"
 
@@ -72,20 +72,20 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
       - name: Build Docker image
-        run: docker build . --tag gozer/aws-quota-checker:latest
+        run: docker build . --tag gravitational/aws-quota-checker:latest
       - name: Push Docker image for branch
-        if: ${{ github.ref == 'refs/heads/maintainer' && github.event_name == 'push' }}
+        if: ${{ github.ref == 'refs/heads/teleport' && github.event_name == 'push' }}
         run: |
-          docker tag gozer/aws-quota-checker:latest gozer/aws-quota-checker:maintainer
-          docker push gozer/aws-quota-checker:maintainer
+          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:teleport
+          docker push gravitational/aws-quota-checker:teleport
       - name: Push Docker image for branch
-        if: ${{ github.ref == 'refs/heads/maintainer' && github.event_name == 'push' }}
+        if: ${{ github.ref == 'refs/heads/teleport' && github.event_name == 'push' }}
         run: |
-          docker tag gozer/aws-quota-checker:latest gozer/aws-quota-checker:maintainer
-          docker push gozer/aws-quota-checker:maintainer
+          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:teleport
+          docker push gravitational/aws-quota-checker:teleport
       - name: Push Docker image for tag
         if: ${{ startsWith(github.ref, 'refs/tags') && github.event_name == 'push' }}
         run: |
-          docker tag gozer/aws-quota-checker:latest gozer/aws-quota-checker:${GITHUB_REF##*/}
-          docker push gozer/aws-quota-checker:latest
-          docker push gozer/aws-quota-checker:${GITHUB_REF##*/}
+          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:${GITHUB_REF##*/}
+          docker push gravitational/aws-quota-checker:latest
+          docker push gravitational/aws-quota-checker:${GITHUB_REF##*/}
