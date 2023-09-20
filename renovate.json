@@ -2,9 +2,12 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "forkProcessing": "enabled",
   "baseBranches": [
-    "master"
+    "teleport"
   ],
   "extends": [
     "config:best-practices"
   ]
+  "ignorePaths": {
+    ".github/workflows/test-and-publish.yml"
+  }
 }

@@ -1,28 +1,17 @@
-on:
-  pull_request:
-    branches:
-      - teleport
-      - master
-  push:
-    branches:
-      - teleport
-      - master
-    tags:
-      - "*"
+on: workflow_dispatch
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - uses: actions/checkout@v2
       - name: setup Python
-        uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4
+        uses: actions/setup-python@v2
         with:
           python-version: "3.8"
       - name: install
         run: pip install .
       - name: run all checks
-        if: ${{ false }}
         run: aws-quota-checker check all
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
@@ -34,9 +23,9 @@ jobs:
     needs: test
     if: success() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - uses: actions/checkout@v2
       - name: setup Python
-        uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4
+        uses: actions/setup-python@v2
         with:
           python-version: "3.8"
       - name: install
@@ -47,12 +36,12 @@ jobs:
       - name: build package
         run: python setup.py bdist_wheel
       - name: publish package
-        uses: pypa/gh-action-pypi-publish@b7f401de30cb6434a1e19f805ff006643653240e # v1.8.10
+        uses: pypa/gh-action-pypi-publish@v1.4.2
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
       - name: create Release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -65,27 +54,23 @@ jobs:
     needs: test
     name: Build and push Docker image
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - uses: actions/checkout@v2
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2
+        uses: docker/login-action@v1
         with:
+          registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
       - name: Build Docker image
-        run: docker build . --tag gravitational/aws-quota-checker:latest
+        run: docker build . --tag ghcr.io/brennerm/aws-quota-checker:latest
       - name: Push Docker image for branch
-        if: ${{ github.ref == 'refs/heads/teleport' && github.event_name == 'push' }}
+        if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
         run: |
-          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:teleport
-          docker push gravitational/aws-quota-checker:teleport
-      - name: Push Docker image for branch
-        if: ${{ github.ref == 'refs/heads/teleport' && github.event_name == 'push' }}
-        run: |
-          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:teleport
-          docker push gravitational/aws-quota-checker:teleport
+          docker tag ghcr.io/brennerm/aws-quota-checker:latest ghcr.io/brennerm/aws-quota-checker:master
+          docker push ghcr.io/brennerm/aws-quota-checker:master
       - name: Push Docker image for tag
         if: ${{ startsWith(github.ref, 'refs/tags') && github.event_name == 'push' }}
         run: |
-          docker tag gravitational/aws-quota-checker:latest gravitational/aws-quota-checker:${GITHUB_REF##*/}
-          docker push gravitational/aws-quota-checker:latest
-          docker push gravitational/aws-quota-checker:${GITHUB_REF##*/}
+          docker tag ghcr.io/brennerm/aws-quota-checker:latest ghcr.io/brennerm/aws-quota-checker:${GITHUB_REF##*/}
+          docker push ghcr.io/brennerm/aws-quota-checker:latest
+          docker push ghcr.io/brennerm/aws-quota-checker:${GITHUB_REF##*/}

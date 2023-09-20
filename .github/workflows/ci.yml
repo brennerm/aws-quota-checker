@@ -1,0 +1,20 @@
+on:
+  pull_request:
+    branches:
+      - teleport
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - name: setup python
+        uses: actions/setup-python@61a6322f88396a6271a6ee3565807d608ecaddd1 # v4
+        with:
+          python-version: "3.8"
+      - name: install
+        run: pip install .[dev]
+      - name: build package
+        run: python setup.py bdist_wheel
+      - name: build docker image
+        run: docker build . --tag gravitational/aws-quota-checker:test
